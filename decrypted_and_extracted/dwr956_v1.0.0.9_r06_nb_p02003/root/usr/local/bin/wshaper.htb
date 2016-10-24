@@ -1,0 +1,321 @@
+#!/bin/sh
+# Wonder Shaper
+# please read the README before filling out these values 
+#
+# Set the following values to somewhat less than your actual download
+# and uplink speed. In kilobits. Also set the device that is to be shaped.
+#	USAGE:
+#		wshaper {upstream interface} {maximum rate}
+#		wshaper status
+#   wshaper {upstream interface} stop
+#	I.E.:
+#		# for a 256Kbps upstream connection (put a smaller
+#		# value if it doesn't work perfectly
+#		#
+#	wshaper eth2 220
+#		#
+#		# fine tune the upstream value for your needs
+
+##DOWNLINK=800
+UPLINK=$2
+DEV=$1
+
+# low priority OUTGOING traffic - you can leave this blank if you want
+# low priority source netmasks
+NOPRIOHOSTSRC=
+
+# low priority destination netmasks
+NOPRIOHOSTDST=
+
+# low priority source ports
+NOPRIOPORTSRC=
+
+# low priority destination ports
+NOPRIOPORTDST=
+
+
+if [ "$1" = "status" ]
+then
+	for i in $(ls /sys/class/net); do
+		echo "-----------------------------"
+		echo "[qdisc] $i"
+		tc -s qdisc show dev $i
+		echo "[class] $i"
+		tc -s class show dev $i
+		echo "[filter] $i"
+		tc -s filter show dev $i
+	done
+    exit
+fi
+
+
+# clean existing down- and uplink qdiscs, hide errors
+tc qdisc del dev $DEV root    2> /dev/null > /dev/null
+tc qdisc del dev usb0 root    2> /dev/null > /dev/null
+tc qdisc del dev usb1 root    2> /dev/null > /dev/null
+## tc qdisc del dev $DEV ingress 2> /dev/null > /dev/null
+
+# shut-down the mirror interface
+ip link set dev $DEV down 2> /dev/null > /dev/null
+
+if [ "$2" = "stop" ] 
+then 
+	exit
+fi
+
+if [ -z $1 ]; then
+	echo 'Specify output device'
+	exit
+fi
+
+if [ -z $2 ]
+then
+	echo 'Specify output rate (Kbit/s)'
+	exit
+fi
+
+###### uplink
+
+# create the mirror interface
+ip link set dev $DEV up
+
+# set queue size to give latency of about 2 seconds on
+# low-prio packets
+ip link set dev $DEV qlen 1000
+
+# mirror the usb0 and usb1 to ifb0
+tc qdisc add dev usb0 handle 1:0 root prio
+tc qdisc add dev usb1 handle 1:0 root prio
+tc filter add dev usb0 parent 1:0 protocol ip prio 1 u32 match u32 0 0 flowid 1:1 action mirred egress redirect dev $DEV
+tc filter add dev usb1 parent 1:0 protocol ip prio 1 u32 match u32 0 0 flowid 1:1 action mirred egress redirect dev $DEV
+
+# install root HTB, point default traffic to 1:29:
+
+tc qdisc add dev $DEV root handle 1: htb default 29
+
+# shape everything at $UPLINK speed - this prevents huge queues in your
+# DSL modem which destroy latency:
+
+tc class add dev $DEV parent 1: classid 1:1 htb rate ${UPLINK}kbit
+
+# setting main classes: Each class can lend and borrow bandwidth
+# from each-other
+# P2P has the lowest guaranteed bandwidth and lowest priority.
+# P2P: 1/20 of the total bandwidth.
+# Change the following values according to your needs.
+
+# IMS signalling: priority 1 for QCI 5
+tc class add dev $DEV parent 1:1 classid 1:21 htb \
+	rate $(($UPLINK/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 1
+
+# Conversational voice: priority 2 for QCI 1
+tc class add dev $DEV parent 1:1 classid 1:22 htb  \
+	rate $(($UPLINK*6/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 2
+
+# Real time gaming: priority 3 for QCI 4
+tc class add dev $DEV parent 1:1 classid 1:23 htb  \
+	rate $(($UPLINK*3/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 3
+
+# Conversational video (live streaming): priority 4 for QCI 2
+tc class add dev $DEV parent 1:1 classid 1:24 htb  \
+	rate $(($UPLINK*3/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 4
+
+# Non-conversational video (buffered streaming): priority 5 for QCI 3
+tc class add dev $DEV parent 1:1 classid 1:25 htb \
+	rate $(($UPLINK*3/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 5
+
+# Video (buffered streaming): priority 6 for QCI 7
+tc class add dev $DEV parent 1:1 classid 1:26 htb \
+	rate $(($UPLINK/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 6
+
+# TCP-based (e.g. WWW, e-mail) chat, FTP, p2p file sharing, progressive video, etc.: priority 7 for QCI 6
+tc class add dev $DEV parent 1:1 classid 1:27 htb \
+	rate $(($UPLINK/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 7
+	
+# TCP-based (e.g. WWW, e-mail) chat, FTP, p2p file sharing, progressive video, etc.: priority 8 for QCI 8
+tc class add dev $DEV parent 1:1 classid 1:28 htb \
+	rate $(($UPLINK/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 8
+	
+# others: priorit 9 for QCI 9
+tc class add dev $DEV parent 1:1 classid 1:29 htb \
+	rate $(($UPLINK/20))kbit \
+	ceil ${UPLINK}kbit quantum 1 prio 9
+
+# attach qdisc to leaf classes - here we at SFQ to each
+# priority class.  SFQ makes sure that
+#within each class connections will be treated (almost) fairly.
+
+# no sfq 'cause we should have almost no queue here.
+# Better dropping packets than delay them in VoIP
+tc qdisc add dev $DEV parent 1:21 handle 21: pfifo limit 30
+
+tc qdisc add dev $DEV parent 1:22 handle 22: pfifo limit 30
+tc qdisc add dev $DEV parent 1:23 handle 23: pfifo limit 30
+
+# long queue here and sqf not to drop too much packets,
+# if possible
+tc qdisc add dev $DEV parent 1:24 handle 24: sfq perturb 10 \
+	limit 200
+tc qdisc add dev $DEV parent 1:25 handle 25: sfq perturb 10 \
+	limit 200
+tc qdisc add dev $DEV parent 1:26 handle 26: sfq perturb 10 \
+	limit 200
+tc qdisc add dev $DEV parent 1:27 handle 27: sfq perturb 10 \
+	limit 200
+tc qdisc add dev $DEV parent 1:28 handle 28: sfq perturb 10 \
+	limit 200	
+
+# longest queue for really bulk transfers
+tc qdisc add dev $DEV parent 1:29 handle 29: sfq perturb 10  \
+	limit 300
+
+
+####### tc filter
+# 1:21 IMS Signaling/SIP Signaling
+# VoIP, RTSP, (23399, 35724 or others for Skype: set your
+# ports here)
+NOPRIOPORTDST="5060 5061 5062 5063 8000 554 23399 35724"
+for a in $NOPRIOPORTDST
+do
+	tc filter add dev $DEV parent 1: protocol ip prio 1 u32 \
+	   match ip protocol 17 0xff \
+	   match ip dport $a 0xffff flowid 1:21
+ 	tc filter add dev $DEV parent 1: protocol ip prio 1 u32 \
+ 	   match ip protocol 17 0xff \
+	   match ip sport $a 0xffff flowid 1:21
+done
+
+# RTSP
+tc filter add dev $DEV parent 1:0 protocol ip prio 1 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 554 0xffff classid 1:21
+
+# NTP
+tc filter add dev $DEV parent 1:0 protocol ip prio 1 u32  \
+	 match ip protocol 17 0xff \
+	 match ip dport 123 0xffff classid 1:21
+	 
+# pre-configured filter hase the prio greater than 50020	 
+# 1:22 Conversational voice
+# ensure min delay by TOS field Minimum Delay (ssh, NOT scp) in 1:22:
+tc filter add dev $DEV parent 1:0 protocol ip prio 50022 u32 match ip tos 0x10 0xff classid 1:22
+tc filter add dev $DEV parent 1:0 protocol ip prio 50022 u32 match ip tos 0x18 0xff classid 1:22
+tc filter add dev $DEV parent 1:0 protocol ip prio 50022 u32 match ip tos 0x68 0xff classid 1:22
+tc filter add dev $DEV parent 1:0 protocol ip prio 50022 u32 match ip tos 0xb8 0xff classid 1:22
+
+# 1:21 Small Interactive
+# ICMP
+tc filter add dev $DEV parent 1:0 protocol ip prio 50023 u32 \
+   match ip protocol 1 0xff classid 1:23
+
+# SSH, not SCP
+tc filter add dev $DEV parent 1:0 protocol ip prio 50023 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 22 0xffff \
+	 classid 1:23
+
+# telnet
+tc filter add dev $DEV parent 1:0 protocol ip prio 50023 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 23 0xffff classid 1:23
+
+# telnet
+tc filter add dev $DEV parent 1:0 protocol ip prio 50023 u32  \
+	 match ip protocol 6 0xff \
+	 match ip sport 23 0xffff classid 1:23
+	 
+# DNS
+tc filter add dev $DEV parent 1:0 protocol ip prio 50023 u32  \
+	 match ip protocol 17 0xff \
+	 match ip dport 53 0xffff classid 1:23
+
+## iptables -t mangle -A MYSHAPER-OUT -p tcp \
+##	--tcp-flags SYN,RST,ACK SYN,FIN \
+##	-j CLASSIFY --set-class 1:23
+
+# 1:22 Bulk Interactive
+# MSN/Webcam
+tc filter add dev $DEV parent 1:0 protocol ip prio 50024 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 6891 0xffff classid 1:24
+
+# Windows remote desktop
+tc filter add dev $DEV parent 1:0 protocol ip prio 50024 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 3389 0xffff classid 1:24
+
+# 1:22 Games
+
+# 1:23 Low port services
+# Default for low port traffic
+##tc filter add dev $DEV parent 1:0 protocol ip prio 50024 u32  \
+##	 match ip protocol 6 0xff \
+##	 match ip sport 1024 0xffff classid 1:24
+
+# 1:27 User apps
+# ICQ (add tcp 4000 for old icq protocols, if needed), MSN
+tc filter add dev $DEV parent 1:0 protocol ip prio 50027 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 5190 0xffff classid 1:27
+tc filter add dev $DEV parent 1:0 protocol ip prio 50027 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 1863 0xffff classid 1:27
+	 
+# Web (add tcp 80 for Web )
+tc filter add dev $DEV parent 1:0 protocol ip prio 50028 u32  \
+	 match ip protocol 6 0xff \
+	 match ip dport 80 0xffff classid 1:28
+
+# Local services for the Internet
+# Local web server
+#iptables -t mangle -A MYSHAPER-OUT -p tcp --sport http \
+#	-j CLASSIFY --set-class 1:25
+
+# Local smtp server
+#iptables -t mangle -A MYSHAPER-OUT -p tcp --sport smtp \
+#	-j CLASSIFY --set-class 1:25
+
+# small packets (probably just ACKs)
+##iptables -t mangle -A MYSHAPER-OUT -p tcp -m length --length 60 \
+##	-j CLASSIFY --set-class 1:23
+
+# 1:25 Bulk transfers
+# ftp-data port, low prio
+##tc filter add dev $DEV parent 1:0 protocol ip prio 25 u32  \
+##	 match ip protocol 6 0xff \
+##	 match ip dport 20 0xffff classid 1:25
+
+# 1:26 P2P, etc. Everything that hasn't been classified since now,
+# is considered bulk
+# like P2P, and will have it's lowest priority
+# P2P
+#iptables -t mangle -A MYSHAPER-OUT -m ipp2p --ipp2p \
+#	-j CLASSIFY --set-class 1:126
+
+########## downlink #############
+# slow downloads down to somewhat less than the real speed  to prevent 
+# queuing at our ISP. Tune to see how high you can set it.
+# ISPs tend to have *huge* queues to make sure big downloads are fast
+#
+# attach ingress policer:
+
+## tc qdisc add dev $DEV handle ffff: ingress
+
+# filter *everything* to it (0.0.0.0/0), drop everything that's
+# coming in too fast:
+
+## tc filter add dev $DEV parent ffff: protocol ip prio 50 u32 match ip src \
+##   0.0.0.0/0 police rate ${DOWNLINK}kbit burst 10k drop flowid :1
+
+##################################################################
+# Done with outbound shaping
+##################################################################
+echo "Outbound shaping added to $DEV.  Rate: ${UPLINK}Kb/s."

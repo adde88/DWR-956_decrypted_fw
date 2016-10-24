@@ -1,0 +1,21 @@
+Package: kmod-ipsec6
+Version: 2.6.32.42-1
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ipsec, kmod-iptunnel6
+Provides: 
+Source: package/kernel
+Section: kernel
+Status: unknown hold not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 14294
+Description:  Kernel modules for IPsec support in IPv6.
+ Includes:
+ - ah6
+ - esp6
+ - ipcomp6
+ - xfrm6_mode_beet
+ - xfrm6_mode_transport
+ - xfrm6_mode_tunnel
+ - xfrm6_tunnel

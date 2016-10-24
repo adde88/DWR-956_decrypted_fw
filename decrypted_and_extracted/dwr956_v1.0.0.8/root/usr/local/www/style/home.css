@@ -1,0 +1,247 @@
+
+/* Home Start */
+
+#home_all {
+ width:1000px;
+ margin:0 auto;
+ background-color:#FFF;
+ overflow:hidden;
+}
+
+table.specTblHome td {
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ font-family: Arial, Verdana, sans-serif;
+ font-size: 12px;
+ color: #616161;
+ text-decoration: none;
+ text-align: left;
+ font-weight: normal;
+}
+
+#home_main_page {
+	width: 1000px;
+	height: auto;
+	margin: 0 auto;
+}
+
+#home_main_page_background {
+	background-image: url(../images/home/Home_HomeBg.jpg);
+	background-repeat: no-repeat;
+	height: 568px;
+	width: 1000px;
+	top: 139px;
+	position: absolute;
+}
+
+/* Item:System --start */
+#home_system_content {
+	height: 135px;
+	width: 122px;
+	position: absolute;
+	top: 190px;
+	left: 408px;
+	z-index: 1;
+}
+
+.system_table_icon {
+	height: 135px;
+	width: 122px;
+}
+
+ul#home_content_system {
+	list-style-type: none;
+	margin: 0;
+	padding: 0px;
+	text-align: left;
+	width: 200px;
+}
+
+.home_content_system_text {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #333;
+	text-decoration: none;
+	font-weight: bold;
+}
+/* Item:System --end */
+
+/* Item:Internet --start */
+.home_internet_table_icon {
+	height: 297px;
+	width: 103px;
+}
+
+.home_internet_table_content_background {
+	background-image: url(../images/home/Home_Content_Internet.png);
+	background-repeat: no-repeat;
+	height: 297px;
+	width: 215px;
+	float: left;
+}
+/* Item:Internet --end */
+
+/* Item:WiFi --start */
+.home_wifi_table_icon {
+	height: 297px;
+	width: 82px;
+}
+/* Item:WiFi --end */
+
+.home_table_icon {
+	height: 171px;
+	width: 82px;
+}
+
+.home_table_content_background {
+	background-image: url(../images/home/Home_Content.png);
+	background-repeat: no-repeat;
+	height: 171px;
+	width: 215px;
+	float: left;
+}
+
+ul.home_content_list {
+	margin: 0;
+	padding-top: 20px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	float: left;
+	list-style-type: none;
+	height: 171px;
+	width: 215px;
+}
+
+ul.home_content_internet_list {
+	margin: 0;
+	padding-top: 20px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	float: left;
+	list-style-type: none;
+	height: 297px;
+	width: 215px;
+}
+
+.home_content_list_title {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #333;
+	text-decoration: none;
+	font-weight: bold;
+	text-align: left;
+	line-height: 18px;
+}
+
+.home_content_list_text {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #616161;
+	text-decoration: none;
+	text-align: left;
+	font-weight: normal;
+}
+
+/* Item:LTE --start */
+#home_lte_content {
+	display: inline;
+	height: 297px;
+	width: 318px;
+	position: absolute;
+	top: 130px;
+	left: 40px;
+}
+
+#line_lte {
+	height: 43px;
+	width: 49px;
+	position: absolute;
+	top: 240px;
+	left: 359px;
+}
+
+.line_lte_image {
+	height: 43px;
+	width: 49px;
+}
+/* Item:LTE --end */
+
+/* Item:WIFI --start */
+#home_wifi_content {
+	display: inline;
+	position: absolute;
+	top: 20px;
+	left: 637px;
+	height: 297px;
+	width: 297px;
+}
+
+#line_wifi {
+	height: 154px;
+	width: 106px;
+	position: absolute;
+	top: 80px;
+	left: 530px;
+}
+
+.line_wifi_image {
+	height: 154px;
+	width: 106px;
+}
+/* Item:WIFI --end */
+
+/* Item:LAN --start */
+#home_lan_content{
+	display: inline;
+	height: 171px;
+	width: 297px;
+	float: left;
+	position: absolute;
+	top: 340px;
+	left: 637px;
+}
+
+#line_lan{
+	height: 146px;
+	width: 106px;
+	position: absolute;
+	top: 290px;
+	left: 530px;
+}
+
+.line_lan_image{
+	height: 146px;
+	width: 106px;
+}
+/* Item:LAN --end */
+
+#home_copyright {
+	background-image: url(../images/home/Home_HomeDown_Copyright.jpg);
+	background-repeat: no-repeat;
+	height: 15px;
+	width: 1000px;
+	position: absolute;
+	top: 707px;
+}
+
+li {
+ width:200px;
+ white-space:nowrap;
+ text-overflow:ellipsis;
+ -o-text-overflow:ellipsis;
+ overflow: hidden;
+}
+
+#home_hint_message{
+ position: absolute;
+ top: 30px;
+ left: 270px;
+ width: 350px;
+ height: 25px;
+ border:2px solid #FF0033;
+ text-align: center;
+}
+/* Home End */

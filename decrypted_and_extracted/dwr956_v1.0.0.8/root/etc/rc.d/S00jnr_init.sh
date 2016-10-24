@@ -1,0 +1,1 @@
+../init.d/jnr_init.sh

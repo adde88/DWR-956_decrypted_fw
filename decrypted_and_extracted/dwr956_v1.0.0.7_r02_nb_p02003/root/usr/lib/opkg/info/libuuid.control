@@ -1,0 +1,13 @@
+Package: libuuid
+Version: 1.41.11-1
+Depends: 
+Provides: 
+Source: package/e2fsprogs
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 6936
+Description:  Library for generating DCE compatible Universally Unique Identifiers.

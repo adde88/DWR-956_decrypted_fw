@@ -1,0 +1,13 @@
+Package: ifx-voice-cpe-tapidemo
+Version: 5.1.1.32-1
+Depends: ifx-voice-cpe-tapi
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-tapidemo
+Section: application
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 398018
+Description:  Voice Access mini-PBX Demo Application

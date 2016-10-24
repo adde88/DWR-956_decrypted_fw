@@ -1,0 +1,13 @@
+Package: atheros
+Version: 1.1
+Depends: kmod-ltqcpe_wlan_atheros
+Provides: 
+Source: package/feeds/thirdparty_sw/atheros
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Infineon Technologies AG
+Architecture: ltqcpe
+Installed-Size: 1669907
+Description:  This package contains atheros scripts/binaries

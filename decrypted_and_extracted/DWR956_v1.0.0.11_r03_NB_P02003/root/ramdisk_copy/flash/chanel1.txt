@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel> 
+<item>
+<title>Sangakara rues lack of practice </title>
+<description>Kumar Sangakkara has said Sri Lanka's lack of practice at the World Cup venues. In an extraordinary address at the MCC Spirit of Cricket Lecture at Lord's, Kumar </description>
+<link>http://www.espncricinfo.com/icc_cricket_worldcup2011/</link>
+<pubDate>11:08:11:11:46:47</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>South Africa better prepared this time</title>
+<description>South Africa captain Graeme Smith has said that his team is better prepared South Africa have confirmed that they are in favour of retaining the rotation system  </description>
+<link>http://www.espncricinfo.com/icc_cricket_worldcup2011</link>
+<pubDate>11:08:05:12:00:10</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>Simons pleased with Ishants resurgence</title>
+<description>Eric Simons, the India bowling coach, is pleased with the resurgence in Ishant Sharma's bowling in the ongoing West Indies tour, </description>
+<link>http://www.espncricinfo.com/icc_cricket_worldcup2011/</link>
+<pubDate>11:08:04:10:07:03</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>England Lions, CCC record comfortable wins</title>
+<description>A round-up of the third day of the first round of the Regional Four Day Competition</description>
+<link>http://www.espncricinfo.com/wi4day-10/content/</link>
+<pubDate>11:01:10:09:00:59</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>Watson wins second Allan Border Medal</title>
+<description>Shane Watson has confirmed himself as Australia's most important player by winning,onfirmed himself as Australia's most important player by winning </description>
+<link>http://www.espncricinfo.com/australia/</link>
+<pubDate>11:07:20:11:20:35</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>'West Indies aiming for top five by 2015' - Sammy</title>
+<description>Sammy took charge of the side in a period of turmoil caused by the team's on-field disappointments, and continued wrangling between the board and senior players, Gayle in particular. Several critics have questioned Sammy's place in the side as an allrounder, pointing to his modest batting returns at No. 8.</description>
+<link>http://www.espncricinfo.com/australia/</link>
+<pubDate>10:07:11:11:20:35</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>Tendulkar not thinking of 100th hundred</title>
+<description>"I am not thinking of records," Tendulkar told the Daily Telegraph. "I am just thinking of enjoying this tour. The secret to any performance is not in chasing records. I think about, 'What is the best way to enjoy the game, and how can I enhance that enjoyment factor?' </description>
+<link>http://www.espncricinfo.com/India/</link>
+<pubDate>11:02:10:23:23:23</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>Opportunity lost for India in hard-fought series win</title>
+<description>In the end both teams said they are happy. From the outside it appeared West Indies should be a happier unit than India who never quite stamped their authority. They won the series but was that ever in doubt against this West Indies batting line-up? This series was about testing out the youth for India but barring Suresh Raina and Ishant Sharma, not many stood up. </description>
+<link>http://www.espncricinfo.com/australia/</link>
+<pubDate>11:06:10:11:20:35</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>Johnson says no to BBL</title>
+<description>Johnson is conserving his resources to concentrate on international cricket. It is a sound decision given that he is still to harness the consistency befitting an Australian spearhead - one of the chief tasks confronting the new bowling coach Craig McDermott will be to help Johnson do so.</description>
+<link>http://www.espncricinfo.com/australia/</link>
+<pubDate>11:06:10:11:20:35</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<title>Plenty to ponder for Bangladesh selectors</title>
+<description>As with almost every selection meeting here, the focus will be on the batsmen though the bowling line-up looks increasingly like a one-man show in captain Shakib Al Hasan </description>
+<link>http://www.espncricinfo.com/australia/</link>
+<pubDate>11:06:10:11:20:35</pubDate>
+<readstatus>1</readstatus>
+</item>
+</channel>
+</rss>

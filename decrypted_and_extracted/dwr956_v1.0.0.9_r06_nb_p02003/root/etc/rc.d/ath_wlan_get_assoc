@@ -1,0 +1,67 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+ATH_IF=""
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+
+    assoc_sta_file=/tmp/assoc_sta_file
+    rm -f ${assoc_sta_file}
+    wlanconfig ${APNAME} list sta >>${assoc_sta_file}
+    
+    assoc_count=0
+    MACLIST=`cat ${assoc_sta_file} | cut -d " " -f 1`
+    #echo $MACLIST
+    for i in $MACLIST; do
+       if [ "$i" != "ADDR" ]; then
+            assoc_count=`expr $assoc_count + 1`
+       fi
+    done
+    
+    echo "assoc_count=\"$assoc_count\""
+    
+    assoc_count=0
+    MACLIST=`cat ${assoc_sta_file} | cut -d " " -f 1`
+    for i in $MACLIST; do
+        if [ "$i" != "ADDR" ]; then
+            echo "mac_${assoc_count}=\"${i}\""
+            arp_file=/proc/net/arp
+            IP_ADDR=$(grep -i "${i}" $arp_file | cut -d " " -f 1)
+            if [ "$IP_ADDR" = "" ]; then
+                echo "ip_$assoc_count=\"0.0.0.0\""
+            else
+                echo "ip_$assoc_count=\"$IP_ADDR\""
+            fi
+            echo "auth_$assoc_count=\"1\""
+            Rate=$(grep -i "${i}" $assoc_sta_file | cut -c 29-31 | cut -d " " -f 2)
+            echo "rate_$assoc_count=\"$Rate\""
+            echo "wpa2UCcipher_$assoc_count=\"0\""
+            echo "wpa2MCcipher_$assoc_count=\"0\""
+            echo "wpa2PMK_$assoc_count=\"0\""
+            
+            assoc_count=`expr $assoc_count + 1`
+        fi
+    done
+fi

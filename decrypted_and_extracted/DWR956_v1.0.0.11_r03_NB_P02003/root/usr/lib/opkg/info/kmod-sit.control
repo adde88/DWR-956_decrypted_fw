@@ -1,0 +1,13 @@
+Package: kmod-sit
+Version: 2.6.32.42-1
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ipv6, kmod-iptunnel4
+Provides: 
+Source: package/kernel
+Section: kernel
+Status: unknown hold not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 8635
+Description:  Kernel modules for IPv6-in-IPv4 tunnelling

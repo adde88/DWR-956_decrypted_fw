@@ -1,0 +1,16 @@
+Package: libsqlite3e
+Version: 3071300-1
+Depends: libpthread, libumi, evtdsptch-header
+Provides: 
+Source: package/wnc-packages/sqlite3e
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 332411
+Description:  SQLite is a small C library that implements a self-contained, embeddable,
+ zero-configuration SQL database engine.
+ This package contains the SQLite (v3.x) shared library, used by other
+ programs.

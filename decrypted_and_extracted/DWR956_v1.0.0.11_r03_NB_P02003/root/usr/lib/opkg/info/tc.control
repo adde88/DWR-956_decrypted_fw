@@ -1,0 +1,13 @@
+Package: tc
+Version: 2.6.39-1
+Depends: kmod-sched
+Provides: 
+Source: package/feeds/open_applications/iproute2
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 97787
+Description:  Traffic control utility

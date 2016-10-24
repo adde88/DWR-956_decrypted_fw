@@ -1,0 +1,2 @@
+/lib/modules/2.6.32.42/drv_event_logger.ko
+/etc/modules.d/15-ltq-evtlog

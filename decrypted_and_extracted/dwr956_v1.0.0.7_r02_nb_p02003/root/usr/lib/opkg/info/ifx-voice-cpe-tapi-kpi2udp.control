@@ -1,0 +1,13 @@
+Package: ifx-voice-cpe-tapi-kpi2udp
+Version: 3.0.4.0-1
+Depends: ifx-voice-cpe-tapi, kmod-ifxos
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-tapi-kpi2udp
+Section: driver
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 4704
+Description:  RTP packet path acceleration into IP stack (strongly recommended)

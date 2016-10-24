@@ -1,0 +1,13 @@
+Package: ifx-voice-cpe-libt38
+Version: 1.29-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-libt38
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 106
+Description:  This library will be used by Fax/T.38 applications.

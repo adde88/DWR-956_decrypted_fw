@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# NOTE : VoIP service needs interface with valid ip address to run
+# in case of IP Bridge WAN, interface should be br0 (not actual WAN interface)
+# in case of IP Routed WAN, interface will be actual WAN interface
+
+# $1 : index {>= 0}, $2 : type {IP,PPP}
+
+export LD_LIBRARY_PATH=/usr/lib
+
+#Check if someone is restarting voip
+while [ -f /tmp/start_voip_lock ]
+do
+echo start locked
+sleep 1
+done
+
+touch /tmp/start_voip_lock
+
+
+#Reset register and hoot status. And reaset phone led 
+rm -f /tmp/phone1_status
+rm -f /tmp/phone2_status
+rm -f /tmp/phone1_hook
+rm -f /tmp/phone2_hook
+rm -f /tmp/voip_led_lock
+/usr/local/bin/voip_led.sh
+
+
+#Check if someone writing rc.conf
+while [ -f /tmp/rc_conf_lock ]
+do
+echo locked
+sleep 5
+done
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+if [ "$CONFIG_FEATURE_IFX_VOIP" = "1" ]; then
+	if [ ! "$ENVLOADED" ]; then
+        if [ -r /etc/rc.conf ]; then
+                . /etc/rc.conf 2> /dev/null
+                ENVLOADED="1"
+        fi
+	fi
+
+	if [ "$2" = "ip" ]; then
+		sipiface=LTE-WAN1
+	  eval ipType='$'wanip_1_addrType
+	  if [ "$ipType" != "0" ]; then
+	      . /etc/rc.d/get_wan_if 1 $2
+	  else
+	      WAN_IFNAME="usb0"
+	  fi
+	else
+		sipiface=WANPPP${1}
+	    . /etc/rc.d/get_wan_if $1 $2
+	fi
+
+	if [ "$SIP_IF" = "$sipiface" ]; then
+			PID="`cat /var/run/ifxsip.pid 2> /dev/null`"
+			if [ -z "$PID" ]; then
+				#if [ -n "$CONFIG_TARGET_LTQCPE_PLATFORM_DANUBE" -a $CONFIG_TARGET_LTQCPE_PLATFORM_DANUBE = "1" ]; then
+				#	echo 1 > /sys/class/leds/vdsl2_reset/brightness
+				#fi
+
+				#if [ "$CONFIG_IFX_CONFIG_CPU" = "XRX3XX" ]; then
+				#	mem -s 0x1e100bb8 -w 0x00091d00 -u
+				#	mem -s 0x1e100bb0 -w 0x8f000000 -u
+				#fi
+
+				export WAN="$WAN_IFNAME"
+				# for netdev budget 10
+				echo 10 > /proc/sys/net/core/netdev_budget
+				sleep 5
+				/usr/sbin/ifxsip &
+				echo $! > /var/run/ifxsip.pid
+				echo "Running VOIP on interface --- $WAN"
+			else
+				export WAN="$WAN_IFNAME"
+				echo $WAN > /tmp/sipip
+				echo "Changing VOIP interface to --- $WAN"
+				#kill -SIGUSR1 $PID >&- 2>&-
+                rm -rf /var/run/ifxsip.pid
+				killall -9 ifxsip >&- 2>&-
+				killall -9 ifxsip >&- 2>&-
+				killall -9 ifxsip >&- 2>&-
+				sleep 5
+				/usr/sbin/ifxsip &
+				echo $! > /var/run/ifxsip.pid
+				echo "Running VOIP on interface --- $WAN"	
+			fi
+   fi
+fi
+
+sleep 10
+
+#Execute dns script
+/usr/local/bin/voip_dns_cache.sh &
+
+rm -f /tmp/start_voip_lock
+

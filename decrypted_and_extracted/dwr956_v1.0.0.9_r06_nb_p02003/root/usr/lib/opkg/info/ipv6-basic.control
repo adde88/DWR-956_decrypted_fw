@@ -1,0 +1,13 @@
+Package: ipv6-basic
+Version: 20130624-1
+Depends: ipv6-prefix, radvd, wide-dhcpv6
+Provides: 
+Source: package/wnc-packages/ipv6
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 6958
+Description:  WNC IPv6 function

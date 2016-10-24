@@ -1,0 +1,13 @@
+Package: ifx-oam
+Version: 2.3.0.12-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/ifx_oam
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies AG
+Architecture: ltqcpe
+Installed-Size: 13148
+Description:  This package contains Operations Administration & Maintenance module for router 4.x

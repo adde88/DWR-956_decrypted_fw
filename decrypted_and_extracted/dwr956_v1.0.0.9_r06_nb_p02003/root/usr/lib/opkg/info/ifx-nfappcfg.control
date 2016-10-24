@@ -1,0 +1,13 @@
+Package: ifx-nfappcfg
+Version: 2.3.0.10-1
+Depends: ifx-IFXAPIs
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/ifx_nfappcfg
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies AG
+Architecture: ltqcpe
+Installed-Size: 2176
+Description:  This package contain Lantiq NF Application Configuration

@@ -1,0 +1,4 @@
+/lib/upgrade/keep.d/ushare
+/usr/local/bin/dlna.sh
+/usr/local/bin/ushare
+/etc/ushare.conf

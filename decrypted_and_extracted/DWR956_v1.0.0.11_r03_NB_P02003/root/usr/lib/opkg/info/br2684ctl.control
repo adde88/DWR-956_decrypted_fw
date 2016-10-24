@@ -1,0 +1,13 @@
+Package: br2684ctl
+Version: 20040226-1
+Depends: linux-atm
+Provides: 
+Source: package/feeds/open_applications/br2684ctl
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 6670
+Description:  ATM Ethernet bridging configuration utility

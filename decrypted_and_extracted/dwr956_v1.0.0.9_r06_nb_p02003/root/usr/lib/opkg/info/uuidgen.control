@@ -1,0 +1,16 @@
+Package: uuidgen
+Version: 1.41.11-1
+Depends: libuuid
+Provides: 
+Source: package/e2fsprogs
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 1676
+Description:  uuidgen program creates a new universally unique identifier (UUID) 
+ using the libuuid library. The new UUID can reasonably be considered 
+ unique among all UUIDs created on the local system, and among UUIDs 
+ created on other systems in the past and in the future.

@@ -1,0 +1,16 @@
+/usr/lib/libqmiidl.so.1
+/usr/lib/libqmiservices.so.1.0.0
+/usr/lib/libqmi.so.1
+/usr/lib/libqmiidl.so.1.0.0
+/usr/lib/libqmi.so
+/usr/lib/libqcci_legacy.so.1.0.0
+/usr/lib/libqcci_legacy.so
+/usr/lib/libqmiservices.so.1
+/usr/lib/libqmiservices.so
+/usr/lib/libqmi_client_qmux.so
+/usr/lib/libqmi_client_qmux.so.1.0.0
+/usr/lib/libqmiidl.so
+/usr/lib/libqcci_legacy.so.1
+/usr/lib/libqmi_client_qmux.so.1
+/usr/bin/qmuxd
+/usr/lib/libqmi.so.1.0.0

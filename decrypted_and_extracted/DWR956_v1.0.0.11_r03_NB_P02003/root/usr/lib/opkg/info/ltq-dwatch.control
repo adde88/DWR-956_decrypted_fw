@@ -1,0 +1,13 @@
+Package: ltq-dwatch
+Version: 2.3.0.2-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/ltq_dwatch
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 8711
+Description:  This package contain Lantiq dwatch daemon

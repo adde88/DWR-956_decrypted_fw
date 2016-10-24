@@ -1,0 +1,14 @@
+Package: matrixtunnel
+Version: 0.2-1
+Depends: matrixssl
+Provides: 
+Source: package/feeds/open_applications/matrixtunnel
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 10733
+Description:  matrixtunnel is a stripped down version of stunnel 
+ based on matrixssl library.

@@ -1,0 +1,15 @@
+Package: ushare
+Version: 1.1a-4
+Depends: libdlna, libupnp, libffmpeg
+Provides: 
+Source: package/wnc-packages/ushare
+Section: multimedia
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 30457
+Description:  uShare is a UPnP (TM) A/V & DLNA Media Server. It implements the server 
+ component that provides UPnP media devices with information on available 
+ multimedia files.

@@ -1,0 +1,13 @@
+Package: ppp
+Version: 2.4.4-5
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/ppp
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 128946
+Description:  This package contains the PPP (Point-to-Point Protocol) daemon.

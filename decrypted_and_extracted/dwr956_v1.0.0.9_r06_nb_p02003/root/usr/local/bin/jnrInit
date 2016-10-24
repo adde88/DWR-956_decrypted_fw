@@ -1,0 +1,189 @@
+#!/bin/sh
+#
+#   Used to init JNR platform after platform init finish.
+#   Note that, platform need prepare current configuration before using
+#   this script. The detail flow chart you can reference JNRP design document.
+#
+
+# disable PHY first
+switch_utility PortLinkCfgSet 0 0 0 0 10 1 1 0 0 0
+switch_utility PortLinkCfgSet 1 0 0 0 10 1 1 0 0 0
+switch_utility PortLinkCfgSet 2 0 0 0 10 1 1 0 0 0
+switch_utility PortLinkCfgSet 4 0 0 0 10 1 1 0 0 0
+
+sqlCmd="/usr/local/bin/sqlite3"
+sysDBsch="/usr/local/etc/system.sql"
+voipSql="/usr/local/etc/voip.sql"
+usrSQL="/usr/local/etc/user.sql"
+sysDB="/tmp/system.db"
+cmngrDB="/tmp/cmngr.db"
+jnrAscii="/sysconfig/jnr-cfg.ascii"
+jnrAsciiDef="/usr/local/etc/jnr-cfg.ascii.default"
+jnrAsciiPch="/usr/local/etc/jnr-cfg.ascii.patch"
+importDBCmd="/usr/local/bin/import_db"
+ddCfgCmd="/usr/sbin/savecfg.sh"
+varLogMsg="/var/log/messages"
+ipv6Conf="/sysconfig/ipv6-cfg"
+ipv6ConfDef="/usr/local/etc/ipv6-cfg.default"
+vpnConf="/sysconfig/vpn-cfg"
+vpnConfDef="/usr/local/etc/vpn-cfg.default"
+sambaConf="/sysconfig/samba-cfg"
+sambaConfDef="/usr/local/etc/samba-cfg.default"
+
+vol_name=`uboot_env --get --name kernelname`
+
+if [ "$vol_name" = "kernel" ]; then
+    VERSION=`uboot_env --get --name part1_version`
+elif [ "$vol_name" = "kernelb" ]; then
+    VERSION=`uboot_env --get --name part2_version`
+else
+    VERSION=`uboot_env --get --name part1_version`
+fi
+
+sed -i "s/.*firmwareVer.*/config.system\[1\]\[\"firmwareVer\"\] = \"${VERSION}\"/" ${jnrAscii}
+
+# Prepare: umi.ko must to have
+insmod /lib/modules/2.6.32.42/umi.ko  > /dev/null 2>&1
+
+# step 1: import schema
+rm -f ${sysDB}
+${sqlCmd} ${sysDB} < ${sysDBsch} > /dev/null 2>&1
+
+#rm -f ${cmngrDB}
+#${sqlCmd} ${cmngrDB} < ${voipSql} > /dev/null 2>&1
+
+# step 2: import UMI Register table
+${sqlCmd} ${sysDB} < ${usrSQL} > /dev/null 2>&1
+
+# step 3: import user configuration from ascii
+status=0
+if [ -e ${jnrAscii} ]; then
+    echo "Importing configuration..."
+else
+    echo "User configuration doesn't exist..."
+    echo "Restore configuration..."
+    echo "jnrInit: User configuration doesn't exist... Restore configuration..." >> ${varLogMsg}
+    cp ${jnrAsciiDef} ${jnrAscii}
+    /usr/local/bin/update_to_default_config_essid.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_sn.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_wpakey.sh $jnrAscii
+    /usr/local/bin/update_to_default_config_imei.sh   $jnrAscii
+    sed -i "s/.*firmwareVer.*/config.system\[1\]\[\"firmwareVer\"\] = \"${VERSION}\"/" ${jnrAscii}
+    ${ddCfgCmd} && sync
+    cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+fi
+
+if [ ! -s ${jnrAscii} ]
+then 
+	echo "${jnrAscii} is empty, try again 3s later...."
+	echo "jnrInit: ${jnrAscii} is empty, try again 3s later...." >> ${varLogMsg}
+	sleep 3
+
+    echo "Restore configuration..."
+    cp ${jnrAsciiDef} ${jnrAscii}
+    /usr/local/bin/update_to_default_config_essid.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_sn.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_wpakey.sh $jnrAscii
+    /usr/local/bin/update_to_default_config_imei.sh   $jnrAscii
+    sed -i "s/.*firmwareVer.*/config.system\[1\]\[\"firmwareVer\"\] = \"${VERSION}\"/" ${jnrAscii}
+    ${ddCfgCmd} && sync
+    cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+fi
+
+if [ ! -s ${jnrAscii} ]
+then 
+	echo "${jnrAscii} is empty, try again 6s later.... "
+	echo "jnrInit: ${jnrAscii} is empty, try again 6s later...." >> ${varLogMsg}
+	sleep 6
+	
+    echo "Restore configuration..."
+    cp ${jnrAsciiDef} ${jnrAscii}
+    /usr/local/bin/update_to_default_config_essid.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_sn.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_wpakey.sh $jnrAscii
+    /usr/local/bin/update_to_default_config_imei.sh   $jnrAscii
+    sed -i "s/.*firmwareVer.*/config.system\[1\]\[\"firmwareVer\"\] = \"${VERSION}\"/" ${jnrAscii}
+    ${ddCfgCmd} && sync
+    cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+fi
+
+if [ ! -s ${jnrAscii} ]
+then 
+	echo "${jnrAscii} is empty, try again 9s later.... "
+	echo "jnrInit: ${jnrAscii} is empty, try again 9s later...." >> ${varLogMsg}
+	sleep 9
+
+    echo "Restore configuration..."
+    cp ${jnrAsciiDef} ${jnrAscii}
+    /usr/local/bin/update_to_default_config_essid.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_sn.sh  $jnrAscii
+    /usr/local/bin/update_to_default_config_wpakey.sh $jnrAscii
+    /usr/local/bin/update_to_default_config_imei.sh   $jnrAscii
+    sed -i "s/.*firmwareVer.*/config.system\[1\]\[\"firmwareVer\"\] = \"${VERSION}\"/" ${jnrAscii}
+    ${ddCfgCmd} && sync
+    cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+fi
+
+${importDBCmd} ${sysDB} ${jnrAscii} ${jnrAsciiDef} ${jnrAsciiPch}
+status=$?
+if [ "$status" -ne "0" ]; then
+    echo "Importing configuration failed..."
+    cp -f ${jnrAsciiDef} ${jnrAscii}
+    ${ddCfgCmd} && sync
+    cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+    sleep 1 && sync
+    reboot
+fi
+sleep 1 && sync
+
+if [ ! -s ${ipv6Conf} ]
+then
+    echo "ipv6 config does not exist."
+    cp -f ${ipv6ConfDef} ${ipv6Conf}
+fi
+
+if [ ! -s ${vpnConf} ]
+then
+    echo "vpn config does not exist."
+    cp -f ${vpnConfDef} ${vpnConf}
+fi
+
+if [ ! -s ${sambaConf} ]
+then
+    echo "samba config does not exist."
+    cp -f ${sambaConfDef} ${sambaConf}
+fi
+
+# step 4: application initial
+[ -e /usr/local/bin/ap_fw_upgrade.sh ]       && cp /usr/local/bin/ap_fw_upgrade.sh /tmp/ap_fw_upgrade.sh
+[ -e /usr/local/bin/systemInit ]             && systemInit
+[ -e /usr/local/bin/lanInit ]                && lanInit
+[ -e /usr/local/bin/wifiInit ]        		&& wifiInit
+[ -e /usr/local/bin/lanServicesInit ]        && lanServicesInit
+[ -e /usr/local/bin/wanInit ]                && wanInit
+[ -e /usr/local/bin/wanServicesInit ]        && wanServicesInit
+[ -e /usr/local/bin/save_some_sysinfo.sh ]   && save_some_sysinfo.sh
+[ -e /usr/local/bin/syslog.sh ]        && syslog.sh
+[ -e /usr/local/bin/upnp_service.sh ]                && upnp_service.sh
+[ -e /usr/local/bin/dlna.sh ]                && dlna.sh
+
+# modified for making sure dlna server is up
+dlnaStatus=`cat /tmp/dlnaStatus`
+if [ "_$dlnaStatus" = "_" ]; then
+    echo "try dlna.sh again."
+    /usr/local/bin/dlna.sh
+fi
+# end of modified for making sure dlna server is up
+
+# enable PHY last
+switch_utility PortLinkCfgSet 0 0 0 0 10 1 0 3 0 0
+switch_utility PortLinkCfgSet 1 0 0 0 10 1 0 0 0 0
+switch_utility PortLinkCfgSet 2 0 0 0 10 1 0 0 0 0
+switch_utility PortLinkCfgSet 4 0 0 0 10 1 0 0 0 0
+
+# setup the 
+/usr/local/bin/routing.sh

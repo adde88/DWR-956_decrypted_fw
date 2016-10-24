@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+#echo -n "starting VoIP Services..."
+echo -n "Not start VoIP Services..." 
+#sh -x /etc/rc.d/rc.bringup_voip_start 0 ip
+# insert your initial script here...
+echo "Done"

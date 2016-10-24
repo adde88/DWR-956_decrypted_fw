@@ -1,0 +1,30 @@
+ <html>
+   <head>
+     <meta http-equiv="Pragma" content="no-cache">
+     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+     <link rel="stylesheet" href="style.css" type="text/css">
+     <link rel="stylesheet" type="text/css" href="csshorizontalmenu.css" />
+     <script language="JavaScript">
+       function initialize(){
+          <%ifx_get_voip_webinit("initialize");%>
+      }
+    </script>
+  </head>
+ 
+  <body class="decBackgroundDef" onLoad="initialize();">
+  <center><span class="textTitle">Voice over IP</span></center>
+  Welcome to the VoIP domain. Here you can configure the VoIP settings.
+  Currently, we are assuming that you are a Basic user.
+  If you want to switch to the 'Advanced configuration' mode, kindly click on the "Advanced" link in the Header.
+  For help about any of the pages, please click on the "Help" link.
+ 
+  <a target="_blank" href="voip_sys_Debug.asp">Service</a>
+  <a target="_blank" href="voip_profile_main.asp">Profile</a>
+  <a target="_blank" href="voip_line_summary.asp">Line</a>
+  <a target="_blank" href="voip_int_summary.asp">Interface</a>
+  <a target="_blank" href="dectbasestation.asp">DECT Base</a>
+  <a target="_blank" href="dect_modem_one.asp">DECT Modem</a>
+  <a target="_blank" href="diagnostics_dect.asp">DECT Diag</a>
+  </body>
+  </html>
+

@@ -1,0 +1,13 @@
+Package: ifx-config_common_features
+Version: 1.1.1-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/ifx_config_common_features
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies AG
+Architecture: ltqcpe
+Installed-Size: 177777
+Description:  This package contain Lantiq Common Configuration Features (CONFIG_FEATURE) options

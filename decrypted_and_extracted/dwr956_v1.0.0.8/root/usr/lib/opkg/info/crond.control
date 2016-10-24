@@ -1,0 +1,13 @@
+Package: crond
+Version: v1.0.0.0-1
+Depends: libsqlite3e, libadaptos, libumi
+Provides: 
+Source: package/wnc-packages/crond
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 4456
+Description:  scheduler daemon

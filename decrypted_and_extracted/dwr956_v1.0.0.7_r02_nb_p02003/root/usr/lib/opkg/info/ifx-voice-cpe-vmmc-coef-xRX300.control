@@ -1,0 +1,14 @@
+Package: ifx-voice-cpe-vmmc-coef-xRX300
+Version: 0.1.0-1
+Depends: ifx-voice-cpe-tapi
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-vmmc-coef-ar10
+Section: firmware
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 851
+Description:  XRX300 voice coefficient samples.
+ Coefficients can be calculated with XTCOS.

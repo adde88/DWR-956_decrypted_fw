@@ -1,0 +1,21 @@
+#!/bin/sh /etc/rc.common
+#
+# cronInit - initialization script for cron
+#
+# Copyright (c) 2007, TeamF1, Inc.
+#
+# modification history
+# --------------------
+# 01a,01jun07,rks written
+
+#. /etc/functions.sh
+
+#START=99
+
+start()
+{
+    echo -n "Starting the cron deamon..."
+    /usr/local/bin/crond /tmp/system.db &
+    echo "crond started"
+}
+

@@ -1,0 +1,16 @@
+Package: lib-dti
+Version: 1.1.4-1
+Depends: libpthread
+Provides: 
+Source: package/feeds/ltq_common/lib-dti
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 27244
+Description:  Debug and Trace Interface (DTI)
+ This package provides a generic library used for the DTI access.
+ This package contains the DTI shared libraries, needed by other programs.
+ - libdti_agent

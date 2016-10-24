@@ -1,0 +1,83 @@
+#!/bin/sh /etc/rc.common
+
+#START=60
+
+start() {
+	#Set port0 as ETH1
+	switch_utility RegisterSet 0xCCD 0x01;
+	LAN_PORT="1 2 4 7 8 9 10"
+	CPU_PORT="6"
+	WAN_PORT="0"
+	LAN1_VLAN_ID="500" 
+	CPU1_VLAN_ID="503"
+	WAN1_VLAN_ID="502"
+	LOGICAL_PORTS="7 8 9 10"
+
+	#Set global switch parameter
+	#VLAN aware enable
+	switch_utility CfgSet 3 1 1536 0 00:00:00:00:00:00   
+
+	#clear all VLAN ID 
+	switch_utility VLAN_IdDelete $LAN1_VLAN_ID
+	switch_utility VLAN_IdDelete $CPU1_VLAN_ID
+	switch_utility VLAN_IdDelete $WAN1_VLAN_ID
+	switch_utility VLAN_IdDelete 501
+	
+	#Create VLAN ID (LAN = 500) FID = 0
+	switch_utility VLAN_IdCreate $LAN1_VLAN_ID 1
+	#Create VLAN ID (CPU = 501) FID = 0
+	switch_utility VLAN_IdCreate $CPU1_VLAN_ID 1  
+	#Create VLAN ID (WAN = 502) FID = 1
+	switch_utility VLAN_IdCreate $WAN1_VLAN_ID 2 
+
+
+	#Set default port VID of LAN ports to LAN VID = 500 
+	for lan in $LAN_PORT;do
+	switch_utility VLAN_PortCfgSet $lan $LAN1_VLAN_ID 0 0 3 0 1
+	done
+	#Set default port VID of port 6 to CPU VID = 501 
+	for cpu in $CPU_PORT;do
+	switch_utility VLAN_PortCfgSet $cpu $CPU1_VLAN_ID 0 0 3 0 1
+	done
+	#Set default port VID of port 5 to WAN VID = 502 
+	for wan in $WAN_PORT;do		
+	switch_utility VLAN_PortCfgSet $wan $WAN1_VLAN_ID 0 0 3 0 1
+	done
+	#WAN VLAN membership
+	#WAN port and CPU port included
+	for argument in $CPU_PORT $WAN_PORT; do
+	switch_utility VLAN_PortMemberAdd $WAN1_VLAN_ID $argument 0
+	done
+	#LAN VLAN membership
+	#LAN port and CPU port included
+	for argument in $LAN_PORT $CPU_PORT ;do 
+	switch_utility VLAN_PortMemberAdd $LAN1_VLAN_ID $argument 0
+	done
+	#CPU VLAN membership
+	#all ports included
+	for argument in $LAN_PORT $CPU_PORT $WAN_PORT;do
+	switch_utility VLAN_PortMemberAdd $CPU1_VLAN_ID $argument 0
+	done
+	switch_utility PortCfgSet 0 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 1 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 2 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 4 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 5 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 7 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 8 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 9 1 0 0 0 0 0 1 255 0 0
+	switch_utility PortCfgSet 10 1 0 0 0 0 0 1 255 0 0
+	# Unknown Unicast/multicast Packet
+	switch_utility MAC_TableClear
+	switch_utility MAC_TableEntryRead
+	switch_utility RegisterSet 0x454 0x07f
+	switch_utility RegisterSet 0x455 0x07f
+	
+	iptables -t nat -R PREROUTING 1 -i eth1 -j UPNP
+	iptables -R FORWARD 6 -i eth1 ! -o eth1 -j UPNP
+	iptables -R FWFlood 2 -i eth1 -p tcp -j FW_SYN_FLOOD_WAN
+	iptables -R FWFlood 4 -i eth1 -p tcp -j FW_FIN_FLOOD_WAN
+	iptables -t nat -I NAT_SNAT -o eth1 -j MASQUERADE
+}
+
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+[ -e /usr/local/bin/voipInit ] && voipInit
+[ -e /usr/local/bin/tr69Init ] && tr69Init
+[ -e /usr/local/bin/ddns.sh ] && ddns.sh

@@ -1,0 +1,3 @@
+/bin/hostapd
+/bin/hostapd.eap_user
+/bin/hostapd_cli

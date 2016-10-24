@@ -1,0 +1,13 @@
+Package: kmod-ltq-evtlog
+Version: 2.6.32.42+1.1.2-1
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ifxos
+Provides: 
+Source: package/feeds/ltq_common/ltq-evtlog
+Section: kernel
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq
+Architecture: ltqcpe
+Installed-Size: 45436
+Description:  Event Logger Kernel Module

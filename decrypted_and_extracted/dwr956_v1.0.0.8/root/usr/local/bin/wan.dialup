@@ -1,0 +1,55 @@
+#! /bin/sh
+
+WAN_IF=eth1
+
+ifconfig $WAN_IF up
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+UDHCPC_WAN_PIDFILE="/tmp/udhcpc_wan.pid"
+lastpid=`cat ${UDHCPC_WAN_PIDFILE}`
+rm -f /tmp/dhcpc_wan.result
+if [ ! "_$lastpid" = "_" ]; then
+	kill -9 ${lastpid}
+fi
+
+	echo "wan ipv4 dhcp mode"
+	
+	##
+	## Run the DHCP client on this interface
+	##
+	udhcpc -i $WAN_IF -p ${UDHCPC_WAN_PIDFILE} -s /usr/local/bin/udhcpc_wan.script -S &
+	sleep 3
+	
+	WAN_ADDR=`grep 'ip ' /tmp/dhcpc_wan.result |sed '1s/ip //'`
+	echo "load the eth1 address : $WAN_ADDR"
+
+	if [ "_$WAN_ADDR" = "_" ]
+	then 
+		echo "eth1 not ready,try again 3s later.... "
+		sleep 3
+	fi
+
+	WAN_ADDR=`grep 'ip ' /tmp/dhcpc_wan.result |sed '1s/ip //'`
+	if [ "_$WAN_ADDR" = "_" ]
+	then 
+		echo "eth1 not ready,try again 6s later.... "
+		sleep 6
+	fi
+
+	WAN_ADDR=`grep 'ip ' /tmp/dhcpc_wan.result |sed '1s/ip //'`
+	if [ "_$WAN_ADDR" = "_" ]
+	then 
+		echo "eth1 not ready,try again 9s later.... "
+		sleep 9
+	fi
+
+	WAN_ADDR=`grep 'ip ' /tmp/dhcpc_wan.result |sed '1s/ip //'`
+	if [ "_$WAN_ADDR" = "_" ]
+	then 
+		echo "eth1 cannot get ip address, check your board!!!!!!!!!!"
+		return 0
+	fi
+	
+
+
+	

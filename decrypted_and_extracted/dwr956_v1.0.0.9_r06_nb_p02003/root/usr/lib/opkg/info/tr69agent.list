@@ -1,0 +1,6 @@
+/usr/local/bin/tr69_backup_log.sh
+/usr/local/bin/tr69d
+/usr/local/etc/tr69/Config.ini
+/usr/local/etc/tr69/InstanceList.dat
+/usr/local/etc/tr69/DataModel_TR098.dat
+/usr/local/etc/tr69/tr69DB.map

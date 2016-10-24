@@ -1,0 +1,13 @@
+Package: ifx-voice-cpe-tapi
+Version: 4.9.2.1-1
+Depends: kmod-ifxos
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-tapi
+Section: driver
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 96787
+Description:  Voice Subsystem Telephony API High Level Driver

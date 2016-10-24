@@ -1,0 +1,13 @@
+Package: pptp
+Version: 1.7.1-4
+Depends: ppp, kmod-gre, resolveip
+Provides: 
+Source: package/feeds/packages/net/pptp
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 25951
+Description:  This package contains a PPTP (Point-to-Point Tunneling Protocol) client.

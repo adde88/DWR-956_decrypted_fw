@@ -1,0 +1,1 @@
+../init.d/usb_host_device.sh

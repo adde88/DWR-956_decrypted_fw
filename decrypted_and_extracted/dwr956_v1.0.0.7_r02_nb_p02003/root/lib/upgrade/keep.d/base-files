@@ -1,0 +1,6 @@
+/etc/hosts
+/etc/passwd
+/etc/shadow
+/etc/config/
+/etc/dropbear/
+/etc/crontabs/

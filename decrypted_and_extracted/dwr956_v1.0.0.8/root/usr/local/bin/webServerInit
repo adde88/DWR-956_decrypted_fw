@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+
+# reload part
+# insert your reload function here, if not, just return 0.
+reload(){
+	echo "reload webs"
+	dwatchctl stop webs
+	init
+	exit 0
+}
+
+# Initial part
+init(){
+	echo -n "starting webs Daemon..."
+	dwatchctl add CMD="/usr/local/bin/webs -db /tmp/system.db" KEYNAME=webs DELAY=5
+	dwatchctl start webs
+	echo "Done"
+}
+
+test -f /usr/local/bin/webs || exit 0
+if ps ax | grep -v grep | grep webs > /dev/null
+then
+	reload
+else
+	init
+fi

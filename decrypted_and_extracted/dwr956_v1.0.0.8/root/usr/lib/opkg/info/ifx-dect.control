@@ -1,0 +1,13 @@
+Package: ifx-dect
+Version: 3.3.5.28-1
+Depends: ifx-voice-cpe-tapi, ifx-voip-common
+Provides: 
+Source: package/feeds/ltq_feeds_dect/ifx_dect
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq
+Architecture: ltqcpe
+Installed-Size: 75552
+Description:  This ifx-dect package is DECT subsytem used to realize DECT & VoIP functionality on GW 4.2 onwards.

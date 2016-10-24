@@ -1,0 +1,13 @@
+Package: quagga-libzebra
+Version: 0.99.20-4
+Depends: quagga
+Provides: 
+Source: package/feeds/open_applications/quagga
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Vasilis Tsiligiannis <b_tsiligiannis@silverton.gr>
+Architecture: ltqcpe
+Installed-Size: 103336
+Description:  zebra library

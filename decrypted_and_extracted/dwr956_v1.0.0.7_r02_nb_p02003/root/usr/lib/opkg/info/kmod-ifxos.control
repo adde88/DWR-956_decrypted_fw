@@ -1,0 +1,13 @@
+Package: kmod-ifxos
+Version: 2.6.32.42+1.5.17-3
+Depends: kernel (=2.6.32.42-1-unknown)
+Provides: 
+Source: package/feeds/ltq_common/ifxos
+Section: kernel
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq
+Architecture: ltqcpe
+Installed-Size: 10087
+Description:  Lantiq OS abstraction library

@@ -1,0 +1,14 @@
+Package: kmod-openswan
+Version: 2.6.32.42+2.6.38-2
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ipv6
+Provides: 
+Source: package/feeds/packages/net/openswan
+Section: kernel
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 216465
+Description:  Openswan is an IPsec implementation for Linux.
+ This package contains the Openswan kernel module.

@@ -1,0 +1,13 @@
+Package: bind-libs
+Version: 9.7.2-P3-1
+Depends: 
+Provides: 
+Source: package/feeds/packages/net/bind
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 716495
+Description:  bind shared libraries

@@ -1,0 +1,15 @@
+Package: syslog-ng
+Version: 1.6.12-6
+Depends: libol, librt
+Provides: 
+Source: package/feeds/packages/admin/syslog-ng
+Section: admin
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 46261
+Description:  syslog-ng reads and logs messages to the system console, log
+ files, other machines and/or users as specified by its
+ configuration file.

@@ -1,0 +1,13 @@
+Package: zlib
+Version: 1.2.3-5
+Depends: 
+Provides: 
+Source: package/zlib
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 35077
+Description:  Library implementing the deflate compression method

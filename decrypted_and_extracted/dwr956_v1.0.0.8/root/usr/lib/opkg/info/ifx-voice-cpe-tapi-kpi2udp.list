@@ -1,0 +1,4 @@
+/opt/ifx/bin/drv_kpi2udp.ko
+/etc/init.d/ltq_load_voice_kpi2udp.sh
+/lib/modules/2.6.32.42/drv_kpi2udp.ko
+/opt/lantiq/bin/drv_kpi2udp.ko

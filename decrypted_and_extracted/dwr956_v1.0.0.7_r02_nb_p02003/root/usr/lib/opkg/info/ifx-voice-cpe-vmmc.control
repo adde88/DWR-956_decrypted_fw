@@ -1,0 +1,13 @@
+Package: ifx-voice-cpe-vmmc
+Version: 1.12.2.2-1
+Depends: ifx-voice-cpe-tapi, kmod-ifxos
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-vmmc
+Section: driver
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 120131
+Description:  Voice Subsystem Low Level Driver for XWAY(TM) xRX100, xRX200, xRX300 family devices

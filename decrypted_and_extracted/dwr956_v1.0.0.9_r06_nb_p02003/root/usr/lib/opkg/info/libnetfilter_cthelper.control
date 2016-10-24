@@ -1,0 +1,14 @@
+Package: libnetfilter_cthelper
+Version: 1.0.0-1
+Depends: libmnl
+Provides: 
+Source: package/feeds/packages/net/libnetfilter_cthelper
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 3701
+Description:  libnetfilter_cthelper is a library which allows user-space programs to interface 
+ the kernel connection tracking helpers of the Netfilter subsystem in the Linux kernel. 

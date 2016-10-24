@@ -1,0 +1,5 @@
+/usr/sbin/quagga.init
+/usr/sbin/zebra
+/etc/quagga/zebra.conf
+/usr/sbin/watchquagga
+/etc/init.d/quagga

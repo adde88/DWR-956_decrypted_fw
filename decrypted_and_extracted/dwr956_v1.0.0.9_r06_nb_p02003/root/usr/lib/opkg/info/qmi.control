@@ -1,0 +1,13 @@
+Package: qmi
+Version: M9615AAAARNLZA1502095-1
+Depends: 
+Provides: 
+Source: package/wnc-packages/qmi
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 98214
+Description:  This package contains QMI library

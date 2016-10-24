@@ -1,0 +1,3 @@
+/lib/modules/2.6.32.42/drv_vmmc.ko
+/etc/init.d/ltq_load_voice_vmmc.sh
+/opt/lantiq/bin/drv_vmmc.ko

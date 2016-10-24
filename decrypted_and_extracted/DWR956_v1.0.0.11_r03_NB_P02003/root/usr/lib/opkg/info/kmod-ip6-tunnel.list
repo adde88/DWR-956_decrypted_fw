@@ -1,0 +1,2 @@
+/lib/modules/2.6.32.42/ip6_tunnel.ko
+/etc/modules.d/32-ip6-tunnel

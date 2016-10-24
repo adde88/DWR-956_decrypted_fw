@@ -1,0 +1,12 @@
+#!/bin/sh /etc/rc.common
+
+START=89
+
+start() {
+	[ -e /usr/local/bin/wifiInit ]        		&& wifiInit
+
+
+	switch_cli IFX_FLOW_REGISTER_SET nRegAddr=0x4a nData=0x518
+	#echo 0 > /proc/sys/net/bridge/bridge-nf-call-iptables
+	#echo 0 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
+}

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ "_$ip" = "_" ]
+then
+return
+fi
+
+if [ "_$router" = "_" ]
+then
+return
+fi
+
+/sbin/ifconfig $interface $ip netmask $subnet up
+route add default gw $router dev $interface 
+
+
+echo "udhcpc write ip: $ip and dns: $dns to /tmp/dhcpc_wan.result"
+echo "ip $ip" > /tmp/dhcpc_wan.result
+echo "dns $dns" >> /tmp/dhcpc_wan.result
+echo "netmask $subnet" >> /tmp/dhcpc_wan.result
+echo "gateway $router" >> /tmp/dhcpc_wan.result
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+[ -e /ramdisk/etc/resolv.conf ] && sed -i '/nameserver/d' /ramdisk/etc/resolv.conf
+echo "nameserver 127.0.0.1" >> /ramdisk/etc/resolv.conf
+echo "nameserver $dns" >> /ramdisk/etc/resolv.conf

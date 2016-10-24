@@ -1,0 +1,14 @@
+Package: udev
+Version: 142-1
+Depends: 
+Provides: 
+Source: package/udev
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Geoff Levand <geoffrey.levand@am.sony.com>
+Architecture: ltqcpe
+Installed-Size: 172599
+Description:  udev allows Linux users to have a dynamic /dev directory and it
+ provides the ability to have persistent device names.

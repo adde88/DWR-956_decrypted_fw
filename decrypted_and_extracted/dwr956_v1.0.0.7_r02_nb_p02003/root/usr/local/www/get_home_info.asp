@@ -1,0 +1,1 @@
+<%getHomeInternetInfo1();%>+'~'+<%getHomeInternetInfo2();%>+'~'+<%getHomeTotalWiFiClient();%>+'~'+<%getLanInfo();%>

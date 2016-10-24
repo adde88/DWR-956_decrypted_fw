@@ -1,0 +1,13 @@
+Package: ifx-voice-cpe-wineasy
+Version: 1.5.2.16-1-2
+Depends: ifx-voice-cpe-tapi, ifx-vos, ifx-voice-cpe-lib-nlt
+Provides: 
+Source: package/feeds/ltq_voice_cpe/ifx-voice-cpe-wineasy
+Section: application
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 77898
+Description:  WinEasy voice access tooling

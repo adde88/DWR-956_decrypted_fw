@@ -1,0 +1,15 @@
+Package: radvdump
+Version: 1.8.3-1
+Depends: kmod-ipv6
+Provides: 
+Source: package/feeds/open_applications/radvd
+Section: ipv6
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 6931
+Description:  radvdump prints out the contents of incoming router advertisements sent by radvd
+ or some other software implementing (parts of) "Neighbor Discovery for IP
+ Version 6 (IPv6)" (RFC 4861).

@@ -1,0 +1,14 @@
+Package: ltq-base-files-common
+Version: 1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_common/ltq-base-files-common
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq
+Architecture: ltqcpe
+Installed-Size: 1533
+Description:  This package contains files and system scripts for OpenWrt,
+ common for all Lantiq targets.

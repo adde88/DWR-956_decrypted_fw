@@ -1,0 +1,13 @@
+Package: libumi
+Version: 20130617-1
+Depends: libadaptos
+Provides: 
+Source: package/wnc-packages/libumi
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 5568
+Description:  This package contains UMI library

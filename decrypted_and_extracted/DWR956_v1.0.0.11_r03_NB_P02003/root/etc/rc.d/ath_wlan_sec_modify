@@ -1,0 +1,376 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		. /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+WLMN_INDEX=$1
+WPS_INDEX="0"
+ATH_IF=""
+WLAN_VENDOR_NAME=""
+
+find_vendor_from_index() {
+  eval radioCpeId='$'wlmn_$1'_radioCpeId'
+  if [ "$radioCpeId" = "1" ]; then
+     radioPrefix=0
+  elif [ "$radioCpeId" = "2" ]; then
+     radioPrefix=1
+  fi
+  eval WLAN_VENDOR_NAME='$'wlss_$radioPrefix'_prefixScript'
+  #echo "WLAN_VENDOR_NAME: $WLAN_VENDOR_NAME"
+}
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+echo "ath_wlan_sec_modify $@"
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then # [
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+    eval cpeId='$'wlmn_${WLMN_INDEX}_cpeId
+    eval RADIOCPEID='$'wlmn_${WLMN_INDEX}_radioCpeId
+    eval ESSID='$'wlmn_${WLMN_INDEX}_ssid
+    eval WPSENA='$'wlwps${cpeId}_${WPS_INDEX}_enable
+    eval APDEVNAME='$'wlwps${cpeId}_${WPS_INDEX}_apDevName
+    eval WPATYPE='$'wlsec_${WLMN_INDEX}_beaconType
+    eval AUTHTYPE='$'wlsec_${WLMN_INDEX}_authType
+    eval ENCRTYPE='$'wlsec_${WLMN_INDEX}_encrType
+    eval WEPENCRLVL='$'wlsec_${WLMN_INDEX}_wepEncrLvl
+    eval WEPKEYMODE='$'wlsec_${WLMN_INDEX}_wepKeyType
+    eval WEPKEYINDEX='$'wlsec_${WLMN_INDEX}_wepKeyIndx
+
+    eval IPADDR='$'lan_main_0_ipAddr
+    eval NETMASK='$'lan_main_0_netmask
+    eval BRIDGE='$'lan_main_0_interface
+    
+    if [ "$RADIOCPEID" = "1" ]; then
+        RADIO=0
+    elif [ "$RADIOCPEID" = "2" ]; then
+        RADIO=1
+    fi
+    
+    ifconfig ${APNAME} down
+    
+    #
+    # Do the same for all instances of hostapd, wpa_supplicant, and wsc
+    #
+    HOSTAPD_VER=`hostapd_ath -v 2>&1 | grep hostapd | cut -f2 -d' '`
+    HOSTAPDLIST=`ps | grep /sbin/hostapd_ath | cut -b 1-5`
+    #echo " HOSTAPD_VER: $HOSTAPD_VER HOSTAPDLIST: $HOSTAPDLIST "
+    if [ "${HOSTAPDLIST}" != "" ]; then
+        for i in $HOSTAPDLIST ; do
+            echo "killing $i"
+            kill $i
+        done
+    fi
+    
+    SUPPLIST=`ps | grep wpa_supplicant | cut -b 1-5`
+    if [ "${SUPPLIST}" != "" ]; then
+        for i in $SUPPLIST ; do
+            echo "killing $i"
+             kill $i
+         done
+    fi
+    sleep 4
+        
+    ##
+    ## For safety, delete all /tmp nodes we may re-create
+    ##
+    rm -rf /tmp/br*
+    rm -rf /tmp/aplist*
+    rm -rf /tmp/stalist*
+    rm -rf /tmp/topology*
+    rm -rf /tmp/conf_filename
+    rm -rf /tmp/sta_conf_filename
+    
+    i=0
+    eval wlan_main_Count='$'wlan_main_Count
+    while [ $i -lt $wlan_main_Count ]
+    do
+        eval temp_APNAME=ath${i}
+        echo -e "\tinterface ${temp_APNAME}" >> /tmp/${BRIDGE}
+        i=`expr $i + 1`
+    done
+          
+    APINDEX=`echo ${APNAME}| cut -b 4-4`
+
+    if [ "$APINDEX" != "0" ]; then
+        APINDEX=`expr ${APINDEX} + 1`
+    fi
+    
+    VAPLIST=`iwconfig | grep ${APNAME} | cut -b 1-4`
+    if [ "${VAPLIST}" = "" ]; then
+        echo "VAP ${APNAME} must be created first!! (use makeVAP)"
+        exit
+    fi
+    
+    MODE=`iwconfig ${APNAME} | grep "Mode:Master"`
+    
+    if [ "${WPATYPE}" = "0" ]; then # Basic
+        SECMODE="None"
+        if [ "${ENCRTYPE}" = "1" ]; then # WEP
+    	    SECMODE="WEP"
+    	    eval pcpeId='$'wlsec_${WLMN_INDEX}_cpeId
+            eval WEPKEY_0='$'wlwep${pcpeId}_0_key
+            eval WEPKEY_1='$'wlwep${pcpeId}_1_key
+            eval WEPKEY_2='$'wlwep${pcpeId}_2_key
+            eval WEPKEY_3='$'wlwep${pcpeId}_3_key
+            
+            if [ "${RADIO}" = "0" ]; then
+            	cfg -a WEP_RADIO_NUM0_KEY_1=${WEPKEY_0}
+            	cfg -a WEP_RADIO_NUM0_KEY_2=${WEPKEY_1}
+            	cfg -a WEP_RADIO_NUM0_KEY_3=${WEPKEY_2}
+            	cfg -a WEP_RADIO_NUM0_KEY_4=${WEPKEY_3}
+            	cfg -a AP_PRIMARY_KEY_0=${WEPKEYINDEX}
+            	if [ "${AUTHTYPE}" = "0" ]; then
+                    cfg -a AP_WEP_MODE_0=1
+            	elif [ "${AUTHTYPE}" = "1" ]; then
+                    cfg -a AP_WEP_MODE_0=2
+                fi
+            else
+            	cfg -a WEP_RADIO_NUM1_KEY_1=${WEPKEY_0}
+            	cfg -a WEP_RADIO_NUM1_KEY_2=${WEPKEY_1}
+            	cfg -a WEP_RADIO_NUM1_KEY_3=${WEPKEY_2}
+            	cfg -a WEP_RADIO_NUM1_KEY_4=${WEPKEY_3}
+            	cfg -a AP_PRIMARY_KEY_1=${WEPKEYINDEX}
+            	if [ "${AUTHTYPE}" = "0" ]; then
+                    cfg -a AP_WEP_MODE_1=1
+            	elif [ "${AUTHTYPE}" = "1" ]; then
+                    cfg -a AP_WEP_MODE_1=2
+                fi
+            fi            	
+        fi
+    elif [ "${WPATYPE}" = "1" -o  "${WPATYPE}" = "2" -o "${WPATYPE}" = "3" ]; then
+        SECMODE="WPA"
+        if [ "${AUTHTYPE}" = "2" ]; then
+            SECFILE="EAP"
+	    i=0
+	    eval wlan_1x_Count='$'wlan_1x_Count
+	    eval pcpeId='$'wlsec_${WLMN_INDEX}_cpeId
+	    while [ $i -lt $wlan_1x_Count ]
+	    do		
+		     eval temp_pcpeId='$'wl1x_${i}_pcpeId
+		     if [ "$temp_pcpeId" = "$pcpeId" ]; then
+             wl1x_cpeId=$i
+		     fi
+		     i=`expr $i + 1`
+	
+	    done       	
+            eval GRPKEYENA='$'wl1x_${wl1x_cpeId}_grpKeyEna
+            eval GRPKEYINTVL='$'wl1x_${wl1x_cpeId}_grpKeyIntvl
+            eval WPA2PREAUTHENA='$'wl1x_${wl1x_cpeId}_wpa2PreAuthEna
+            eval RAAUTHINTVL='$'wl1x_${wl1x_cpeId}_reAuthIntvl
+            eval AUTHTYPE='$'wl1x_${wl1x_cpeId}_authType
+            eval AUTHPROTO='$'wl1x_${wl1x_cpeId}_authProto
+            eval RADIUSIP='$'wl1x_${wl1x_cpeId}_radiusIP
+            eval RADIUSPORT='$'wl1x_${wl1x_cpeId}_radiusPort
+            eval RADIUSSEC='$'wl1x_${wl1x_cpeId}_radiusSecret
+            eval DOMAINNAME='$'wl1x_${wl1x_cpeId}_domainName
+            eval USERNAME='$'wl1x_${wl1x_cpeId}_userName
+            if [ "${APINDEX}" = "0" ]; then
+            	cfg -a AP_EAP_REAUTH_PER=${RAAUTHINTVL}
+            	cfg -a AP_AUTH_SERVER=${RADIUSIP}
+            	cfg -a AP_AUTH_PORT=${RADIUSPORT}
+            	cfg -a AP_AUTH_SECRET=${RADIUSSEC}
+		cfg -a AP_WPA_GROUP_REKEY=${GRPKEYINTVL}
+		cfg -a AP_RSN_ENA_PREAUTH=${WPA2PREAUTHENA}
+            else
+            	cfg -a AP_EAP_REAUTH_PER_${APINDEX}=${RAAUTHINTVL}
+            	cfg -a AP_AUTH_SERVER_${APINDEX}=${RADIUSIP}
+            	cfg -a AP_AUTH_PORT_${APINDEX}=${RADIUSPORT}
+            	cfg -a AP_AUTH_SECRET_${APINDEX}=${RADIUSSEC}
+		cfg -a AP_WPA_GROUP_REKEY_${APINDEX}=${GRPKEYINTVL}
+		cfg -a AP_RSN_ENA_PREAUTH_${APINDEX}=${WPA2PREAUTHENA}
+            fi            	
+        else
+            SECFILE="PSK"
+            eval pcpeId='$'wlsec_${WLMN_INDEX}_cpeId
+            eval PSKFLAG='$'wlpsk${pcpeId}_0_pskFlag
+            eval PASSPHRASE='$'wlpsk${pcpeId}_0_passPhrase
+            eval PSK='$'wlpsk${pcpeId}_0_psk
+            if [ "$PSKFLAG" = "0" ]; then
+    	    	if [ "${APINDEX}" = "0" ]; then
+                	cfg -a PSK_KEY=${PASSPHRASE}
+                else
+                	cfg -a PSK_KEY_${APINDEX}=${PASSPHRASE}
+               	fi
+            else
+            	if [ "${APINDEX}" = "0" ]; then
+                	cfg -a PSK_KEY=${PSK}
+                else
+                        cfg -a PSK_KEY_${APINDEX}=${PSK}
+                fi
+            fi
+        fi
+        
+        if [ "${ENCRTYPE}" = "2" ]; then
+            CYPHER="TKIP"
+        elif [ "${ENCRTYPE}" = "3" ]; then
+            CYPHER="CCMP"
+        elif [ "${ENCRTYPE}" = "4" ]; then
+            CYPHER="TKIP CCMP"
+        fi
+    fi
+    
+    if [ "${APINDEX}" = "0" ]; then
+        cfg -a AP_SSID=${ESSID}
+        cfg -a AP_SECMODE=${SECMODE}
+        cfg -a AP_SECFILE=${SECFILE}
+    	cfg -a AP_WPA=${WPATYPE}
+    	cfg -a AP_CYPHER="${CYPHER}"
+	cfg -a WPS_ENABLE=${WPSENA}
+    else
+        cfg -a AP_SSID_${APINDEX}=${ESSID}
+        cfg -a AP_SECMODE_${APINDEX}=${SECMODE}
+        cfg -a AP_SECFILE_${APINDEX}=${SECFILE}
+    	cfg -a AP_WPA_${APINDEX}=${WPATYPE}
+    	cfg -a AP_CYPHER_${APINDEX}="${CYPHER}"
+	cfg -a WPS_ENABLE_${APINDEX}=${WPSENA}
+    fi
+    
+    cfg -a AP_IPADDR=${IPADDR}
+    cfg -a AP_NETMASK=${NETMASK}
+    #echo "WPSENA $WPSENA" 
+    if [ "${WPSENA}" = "1" ]; then
+      echo "WPS ENABLED"
+    	echo ">>>>> WPS ENABLED, ${SECFILE}"
+        iwpriv ${APNAME} wps 1
+            if [ "${MODE}" = "" ]; then
+                #
+                # For client mode and WPS is Enabled use WSC_sta.conf
+                #
+                fname="WSC_sta.conf"
+                fexist=`ls /tmp | grep ${fname}`
+                if [ "${fexist}" = "" ]; then
+                    cp /etc/ath/WSC_sta.conf /tmp
+                fi
+                echo -e "-c/tmp/WSC_sta.conf -i${APNAME} -bbr0" > /tmp/sta_conf_filename
+            else 
+                #echo "for new hostapd"
+                fname="WSC_${APNAME}.conf"
+                fexist=`ls /tmp | grep ${APNAME}`
+                unconf=`cat /tmp/WSC_${APNAME}.conf | grep "^wps_state=2"`
+                if [ "${fexist}" = "" -o "${unconf}" = "" ]; then
+                    #
+                    # We have to use this file "in place" to have WSC work
+            	    # properly.
+            	    #
+            	    echo ">>>>> WPS Translate, Index:${APINDEX}"
+             	    cfg -t${APINDEX} /etc/ath/WSC.conf > /tmp/WSC_${APNAME}.conf
+                    sed -i -e 's/device_name=.*$/device_name='${APDEVNAME}'/g' /tmp/WSC_${APNAME}.conf
+         	fi
+            fi
+    else
+        if [ "${SECMODE}" = "WPA" ]; then
+            if [ "${MODE}" != "" ]; then
+                cfg -t${APINDEX} /etc/ath/${SECFILE}.ap_bss ${APNAME} > /tmp/sec${APNAME}
+            else
+                cfg -t${APINDEX} /etc/ath/${SECFILE}.sta ${APNAME} > /tmp/sup${APNAME}
+            fi
+        fi
+    
+        if [ "${SECMODE}" = "WEP" ]; then
+            eval pcpeId='$'wlsec_${1}_cpeId
+            eval WEPKEY_0='$'wlwep${pcpeId}_0_key
+            eval WEPKEY_1='$'wlwep${pcpeId}_1_key
+            eval WEPKEY_2='$'wlwep${pcpeId}_2_key
+            eval WEPKEY_3='$'wlwep${pcpeId}_3_key
+            
+            if [ "${WEPKEYMODE}" = "0" ]; then
+                iwconfig ${APNAME} key [1] s:$WEPKEY_0 
+                iwconfig ${APNAME} key [2] s:$WEPKEY_1
+                iwconfig ${APNAME} key [3] s:$WEPKEY_2
+                iwconfig ${APNAME} key [4] s:$WEPKEY_3
+            elif [ "${WEPKEYMODE}" = "1" ]; then
+                iwconfig ${APNAME} key [1] $WEPKEY_0
+                iwconfig ${APNAME} key [2] $WEPKEY_1
+                iwconfig ${APNAME} key [3] $WEPKEY_2
+                iwconfig ${APNAME} key [4] $WEPKEY_3
+            fi
+            
+            if [ "${AUTHTYPE}" = "0" ]; then
+                iwpriv ${APNAME} authmode 1 
+            elif [ "${AUTHTYPE}" = "1" ]; then
+                iwpriv ${APNAME} authmode 2
+            fi
+           
+            if [ "${WEPKEYINDEX}" = "0" ]; then
+                iwconfig ${APNAME} key [1]
+            elif [ "${WEPKEYINDEX}" = "1" ]; then
+                iwconfig ${APNAME} key [2]
+            elif [ "${WEPKEYINDEX}" = "2" ]; then
+                iwconfig ${APNAME} key [3]
+            elif [ "${WEPKEYINDEX}" = "3" ]; then
+                iwconfig ${APNAME} key [4]
+            fi
+        fi
+
+	if [ "${SECMODE}" = "None" ]; then
+		iwconfig ${APNAME} key off
+	fi
+    fi
+    
+    
+    i=0
+    eval wlan_security_Count='$'wlan_security_Count
+    while [ $i -lt $wlan_security_Count ]
+    do
+
+      find_vendor_from_index $i
+      if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+      
+    	eval pcpeId='$'wlmn_${i}_cpeId
+    	eval temp_WPSENA='$'wlwps${pcpeId}_${WPS_INDEX}_enable
+    	eval temp_WPATYPE='$'wlsec_${i}_beaconType
+    	if [ "$temp_WPSENA" = "1" -o "$temp_WPATYPE" = "1" -o "$temp_WPATYPE" = "2" -o "$temp_WPATYPE" = "3" ]; then
+    	   if [ "${MODE}" != "" ]; then
+             find_ath_if_from_index $i
+             eval temp_APNAME=ath${ATH_IF}
+             if [ "$temp_WPSENA" = "1" ]; then
+                 eval temp_FNAME=WSC_${temp_APNAME}.conf
+             else
+                 eval temp_FNAME=sec${temp_APNAME}
+             fi
+             #echo "filename: ${temp_FNAME}"
+		         echo -e "/tmp/${temp_FNAME} \c\h" >> /tmp/conf_filename
+         else
+		         eval temp_APNAME=ath${i}
+             if [ "$temp_WPSENA" = "1" ]; then
+                 eval temp_FNAME=WSC_sta.conf
+             else
+                 eval temp_FNAME=sup${temp_APNAME}
+             fi
+
+             cp /etc/ath/${temp_FNAME} /tmp/${temp_FNAME}
+		         echo -e "-c/tmp/${temp_FNAME} -i${temp_APNAME} -b${BRIDGE}" > /tmp/sta_conf_filename
+         fi                   
+      fi
+      fi
+      i=`expr $i + 1`
+
+    done
+    
+    echo "Making Topology File . . ."
+    if [ -f /tmp/conf_filename ]; then
+        /sbin/hostapd_ath  -B `cat /tmp/conf_filename` -e /tmp/entropy
+    fi
+    if [ -f /tmp/sta_conf_filename ]; then
+        wpa_supplicant `cat /tmp/sta_conf_filename` &
+    fi
+    
+    ifconfig ${APNAME} up
+fi # ]

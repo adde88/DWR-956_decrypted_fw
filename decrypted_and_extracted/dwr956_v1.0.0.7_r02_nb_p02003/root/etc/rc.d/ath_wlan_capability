@@ -1,0 +1,75 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+   if [ -r /etc/rc.conf ]; then
+       . /etc/rc.conf 2> /dev/null
+      ENVLOADED="1"
+   fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+   if [ -r /etc/rc.d/config.sh ]; then
+      . /etc/rc.d/config.sh 2>/dev/null
+      CONFIGLOADED="1"
+   fi
+fi
+
+ATH_IF=""
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   echo "ATH_IF $ATH_IF "
+}
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then # [
+	if [ "${1}" = "" ]; then
+           eval APNAME=ath0
+	else
+     find_ath_if_from_index $1
+	   eval APNAME=ath${ATH_IF}
+	fi
+    
+        ap_freq_file=/tmp/ath_freq_data
+        rm -f $ap_freq_file
+        
+        iwlist ${APNAME} freq >> ${ap_freq_file}
+        
+        G_FREQ=$(grep "2.412" $ap_freq_file)
+        A_FREQ=$(grep "5.18" $ap_freq_file)
+            
+	echo "vendor=\"atheros\""
+	if [ "$A_FREQ" = "" ]; then
+	    echo "standard=\"0,2,3,4,5,6\""
+	else
+	    echo "standard=\"0,1,2,3,4,5,6,7,8,9,10\""
+	fi
+	if [ "$A_FREQ" = "" ]; then
+	    echo "freq=\"0\""
+	else
+	    if [ "$G_FREQ" = "" ]; then
+	        echo "freq=\"1\""
+	    else
+	        echo "freq=\"2\""
+	    fi
+	fi
+	echo "powerLvl=\"20,40,60,80,100\""
+	echo "security=\"3\""
+	echo "radius=\"0\""
+	echo "WMM=\"1\""
+	echo "UAPSD=\"0\""
+	echo "WPS=\"1\""
+	echo "WPS_CfgMethods=\"2,4,8\""
+	echo "WDS=\"0\""
+	echo "WDS_RepCount=\"0\""
+	echo "maxVAP=\"8\""
+	echo "maxClientsPerVAP=\"16\""
+	echo "macAddrCntrlPerVAP=\"1\""
+	echo "numMACCntrlEntries=\"8\""
+	echo "numRxAntenna=\"2\""
+	echo "numTxAntenna=\"2\""
+	echo "wideChanSupport=\"1\""
+	echo "MCSrange=\"15\""
+	echo "AMPDUsupport=\"1\""
+	echo "AMSDUsupport=\"1\""	
+fi # ]

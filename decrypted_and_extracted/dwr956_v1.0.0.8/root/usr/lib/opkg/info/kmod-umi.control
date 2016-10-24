@@ -1,0 +1,13 @@
+Package: kmod-umi
+Version: 2.6.32.42+20130617-1
+Depends: kernel (=2.6.32.42-1-unknown)
+Provides: 
+Source: package/wnc-packages/umi
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 6788
+Description:  This package contains UMI driver

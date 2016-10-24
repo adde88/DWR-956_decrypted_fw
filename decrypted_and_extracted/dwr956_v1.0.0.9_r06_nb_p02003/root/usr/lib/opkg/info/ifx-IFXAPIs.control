@@ -1,0 +1,13 @@
+Package: ifx-IFXAPIs
+Version: 2.3.0.87-1
+Depends: open_uboot, ifx-oam
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/ifx_IFXAPIs
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies AG
+Architecture: ltqcpe
+Installed-Size: 230256
+Description:  This package contains Lantiq standard APIs which will be used by other modules.

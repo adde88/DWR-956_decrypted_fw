@@ -1,0 +1,14 @@
+Package: bridge-utils
+Version: 1.4-1
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/bridge-utils
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 11632
+Description:  Manage ethernet bridging: a way to connect networks together to 
+ form a larger network.

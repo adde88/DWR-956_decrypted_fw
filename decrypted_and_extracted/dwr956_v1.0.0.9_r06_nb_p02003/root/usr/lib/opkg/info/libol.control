@@ -1,0 +1,13 @@
+Package: libol
+Version: 0.3.18-2
+Depends: 
+Provides: 
+Source: package/feeds/packages/libs/libol
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 18090
+Description:  Support library for syslog-ng

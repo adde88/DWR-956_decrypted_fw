@@ -1,0 +1,80 @@
+@charset "utf-8";
+
+/* Main Menu Start */
+
+.mainMenuBg1 {
+	background:url("../images/menu/Top_TopBg.jpg") no-repeat scroll 0 0;
+	height:18px;
+}
+
+.mainMenuBg2 {
+	height:121px;
+}
+
+.Top_TopBar {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #FFF;
+	text-decoration: none;
+	padding-left:10px;
+}
+
+A.Top_TopBar {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #FFF;
+	padding-left:10px;
+}
+
+A.Top_TopBar:hover {
+	color: #000;
+}
+
+.mainMenuBg2_bg {
+	background:url("../images/menu/Top_Menu_1pix.jpg");
+}
+
+.topMenuTd_Home,
+.topMenuTd_Internet,
+.topMenuTd_Wifi,
+.topMenuTd_Lan,
+.topMenuTd_Advanced,
+.topMenuTd_System {
+	background:url("../images/menu/Top_Menu_1pix.jpg");
+	text-align: center;
+}
+
+A.topMenuTd_Home_Href,
+A.topMenuTd_Internet_Href,
+A.topMenuTd_Wifi_Href,
+A.topMenuTd_Lan_Href,
+A.topMenuTd_Advanced_Href,
+A.topMenuTd_System_Href {
+	text-decoration: none;
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #009cfa;
+}
+
+A.topMenuTd_Home_Href:hover,
+A.topMenuTd_Internet_Href:hover,
+A.topMenuTd_Wifi_Href:hover,
+A.topMenuTd_Lan_Href:hover,
+A.topMenuTd_Advanced_Href:hover,
+A.topMenuTd_System_Href:hover {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	color: #000000;
+}
+
+.topMenuTd_Home_Img,
+.topMenuTd_Internet_Img,
+.topMenuTd_Wifi_Img,
+.topMenuTd_Lan_Img,
+.topMenuTd_Advanced_Img,
+.topMenuTd_System_Img {
+	position:relative;
+	margin: -37px 0px 0px 0px;
+}
+
+/* Main Menu End */

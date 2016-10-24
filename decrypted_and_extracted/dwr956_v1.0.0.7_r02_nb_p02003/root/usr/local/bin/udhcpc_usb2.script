@@ -1,0 +1,35 @@
+#!/bin/sh
+
+if [ "_$ip" = "_" ]
+then
+return
+fi
+
+if [ "_$router" = "_" ]
+then
+return
+fi
+
+/sbin/ifconfig $interface $ip netmask $subnet up
+#route add default gw $router dev $interface 
+
+echo "udhcpc write ip: $ip and dns: $dns to /tmp/dhcpc_usb2.result"
+echo "ip $ip" > /tmp/dhcpc_usb2.result
+echo "dns $dns" >> /tmp/dhcpc_usb2.result
+echo "netmask $subnet" >> /tmp/dhcpc_usb2.result
+echo "gateway $router" >> /tmp/dhcpc_usb2.result
+
+adv_dns usb2
+if [ ! -e /tmp/dhcpc_usb0.result ] && [ ! -e /tmp/dhcpc_usb1.result ]; then		
+	[ -e /usr/local/bin/ntp.sh ] && ntp.sh
+fi
+
+#killall tr69_resolv.sh >/dev/null 2>&1 # avoid tr69_resolv.sh relaunch many times if only dhcpc restart
+tr69_resolv.sh usb2 $dns &
+
+#Notify VoIP
+/usr/local/bin/voip_ip_chg.sh usb2 &
+#Start a watchdog to check IP
+/usr/local/bin/voip_ip_chk.sh usb2 &
+
+#/usr/local/bin/lte_get --ip-status -q 2 --update-db > /dev/NULL &

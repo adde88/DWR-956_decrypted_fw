@@ -1,0 +1,13 @@
+Package: jnrp-utils
+Version: 20130617-1
+Depends: libmd5, libsqlite3e
+Provides: 
+Source: package/wnc-packages/jnrp-utils
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 15453
+Description:  This package contains jnrp-utils

@@ -1,0 +1,1068 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		. /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+WLMN_INDEX=$1
+WPS_INDEX="0"
+ATH_IF=""
+WLAN_VENDOR_NAME=""
+ATH_CARDS_MOUNTED=0
+
+find_vendor_from_index() {
+  eval radioCpeId='$'wlmn_$1'_radioCpeId'
+  if [ "$radioCpeId" = "1" ]; then
+     radioPrefix=0
+  elif [ "$radioCpeId" = "2" ]; then
+     radioPrefix=1
+  fi
+  eval WLAN_VENDOR_NAME='$'wlss_$radioPrefix'_prefixScript'
+  #echo "WLAN_VENDOR_NAME: $WLAN_VENDOR_NAME"
+}
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+find_no_of_mounted_ath_cards() {
+   eval radio_count='$'wlan_phy_Count
+   i=0
+   ATH_CARDS_MOUNTED=0
+   while [ $i -lt $radio_count ]
+   do
+      #echo "Init i= $i, ap_count = $ap_count"
+      eval wlan_vendor_prefix='$'wlss_$i'_prefixScript'
+      if [ "$wlan_vendor_prefix" = "ath" ]; then
+         ATH_CARDS_MOUNTED=`expr $ATH_CARDS_MOUNTED + 1`
+         #echo "ATH_CARDS_MOUNTED is $ATH_CARDS_MOUNTED"
+      fi
+		  i=`expr $i + 1`
+   done
+}
+
+echo "ath_wlan_ap_start $@"
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then # [
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+    eval cpeId='$'wlmn_${WLMN_INDEX}_cpeId
+    eval RADIOCPEID='$'wlmn_${WLMN_INDEX}_radioCpeId
+    
+    if [ "$RADIOCPEID" = "1" ]; then
+        IFNUM=0
+    elif [ "$RADIOCPEID" = "2" ]; then
+        IFNUM=1
+    fi
+    eval COUNTRY='$'wlphy_${IFNUM}_country
+    eval ENVIRONMENT='$'wlphy_${IFNUM}_usageEnv
+    eval PRICHAN='$'wlphy_${IFNUM}_channelNo
+    eval AUTOCHAN='$'wlphy_${IFNUM}_autochanEna
+    eval BEACONINT='$'wlphy_${IFNUM}_beaconInt
+    eval BEACONTXENA='$'wlphy_${IFNUM}_beaconTxEna
+    eval DTIM_PERIOD='$'wlphy_${IFNUM}_dtimInt
+    eval RTS='$'wlphy_${IFNUM}_rts
+    eval FTS='$'wlphy_${IFNUM}_fts
+    eval AUTORATE='$'wlphy_${IFNUM}_autoRateFallbackEna
+    eval FIXRATE='$'wlphy_${IFNUM}_staticRate
+    eval MCSRATE='$'wlphy_${IFNUM}_nMCS
+    eval R_PREAMBLE='$'wlphy_${IFNUM}_preamble
+    eval R_BAND='$'wlphy_${IFNUM}_freqBand
+    eval R_SHORTGI='$'wlphy_${IFNUM}_nGuardIntvl
+    eval R_CHWIDTH='$'wlphy_${IFNUM}_nChanWidth
+    eval R_EXTOFFSET='$'wlphy_${IFNUM}_nExtChanPos
+    eval R_AMPDUENABLE='$'wlphy_${IFNUM}_nAMPDUena
+    eval R_AMPDUDIR='$'wlphy_${IFNUM}_nAMPDUdir
+    eval R_AMPDULIMIT='$'wlphy_${IFNUM}_nAMPDUlen
+    eval R_AMPDUFRAMES='$'wlphy_${IFNUM}_nAMPDUfrms
+    eval R_AMSDUENABLE='$'wlphy_${IFNUM}_nAMSDUena
+    eval R_AMSDUDIR='$'wlphy_${IFNUM}_nAMSDUdir
+    eval R_AMSDULIMIT='$'wlphy_${IFNUM}_nAMSDUlen
+    eval R_STANDARD='$'wlphy_${IFNUM}_standard
+    eval R_POWERLVL='$'wlphy_${IFNUM}_powerLvl
+    eval R_RADIOENA='$'wlphy_${IFNUM}_radioEnable
+    eval R_DIVENA='$'wlphy_${IFNUM}_nDivEna
+    eval R_DIVDIR='$'wlphy_${IFNUM}_nDivDir
+    eval R_DIVANTNUM='$'wlphy_${IFNUM}_nDivAntennaNum
+    eval R_STBCRX='$'wlphy_${IFNUM}_nSTBCrx
+    eval R_BAWSIZE='$'wlphy_${IFNUM}_nBAWsize
+
+
+    eval APENABLE='$'wlmn_${WLMN_INDEX}_apEnable
+    eval NAME='$'wlmn_${WLMN_INDEX}_apName
+    eval APTYPE='$'wlmn_${WLMN_INDEX}_apType
+    eval ESSID='$'wlmn_${WLMN_INDEX}_ssid
+    eval HIDENSSID='$'wlmn_${WLMN_INDEX}_ssidMode
+    eval BSSIDOVR='$'wlmn_${WLMN_INDEX}_bssidOverride
+    eval BSSID='$'wlmn_${WLMN_INDEX}_bssid
+    eval BASICDATERATE='$'wlmn_${WLMN_INDEX}_basicDataRate
+    eval OPERDATARATE='$'wlmn_${WLMN_INDEX}_operDataRate
+    eval MAXBITRATE='$'wlmn_${WLMN_INDEX}_maxBitRate
+    eval VLANID='$'wlmn_${WLMN_INDEX}_vlanId
+    eval APISOENA='$'wlmn_${WLMN_INDEX}_apIsolationEna
+    eval WMMENA='$'wlmn_${WLMN_INDEX}_wmmEna
+    eval UAPSDENA='$'wlmn_${WLMN_INDEX}_uapsdEna
+    eval WDSENA='$'wlmn_${WLMN_INDEX}_wdsEna
+    eval WPSENA='$'wlwps${cpeId}_${WPS_INDEX}_enable
+    eval APDEVNAME='$'wlwps${cpeId}_${WPS_INDEX}_apDevName
+    
+    eval WPATYPE='$'wlsec_${WLMN_INDEX}_beaconType
+    eval AUTHTYPE='$'wlsec_${WLMN_INDEX}_authType
+    eval ENCRTYPE='$'wlsec_${WLMN_INDEX}_encrType
+    eval WEPENCRLVL='$'wlsec_${WLMN_INDEX}_wepEncrLvl
+    eval WEPKEYMODE='$'wlsec_${WLMN_INDEX}_wepKeyType
+    eval WEPKEYINDEX='$'wlsec_${WLMN_INDEX}_wepKeyIndx
+    eval MACACL='$'wlsec_${WLMN_INDEX}_macAddrCtrlType
+
+    eval IPADDR='$'lan_main_0_ipAddr
+    eval NETMASK='$'lan_main_0_netmask
+    eval BRIDGE='$'lan_main_0_interface
+    
+            
+    PUREG=0
+    PUREN=0
+    IS_11N=0
+    INDOOR="I"
+    OUTDOOR="O"
+    ALLENV=" "
+    
+    WIFI_DEV=$IFNUM
+    VAPLIST=`iwconfig 2>&1 | grep ${APNAME} | cut -b 1-4`
+
+    if [ "${IFNUM}" = "1" ]; then
+       WIFIDEV=`ifconfig | grep wifi0 `
+       if [ "${WIFIDEV}" = "" ]; then
+          WIFI_DEV="0"
+       else
+          find_no_of_mounted_ath_cards
+          if [ $ATH_CARDS_MOUNTED = "2" ]; then
+             WIFI_DEV=$IFNUM
+          else
+             WIFI_DEV="0"
+          fi
+       fi
+    fi
+
+
+    if [ "${VAPLIST}" = "" ]; then
+        if [ "${APTYPE}" = "0" -o "${APTYPE}" = "1" ];  then #VAP
+            echo "Create $APNAME interface for device wifi${WIFI_DEV} "
+            wlanconfig ${APNAME} create wlandev wifi${WIFI_DEV} wlanmode ap
+            #wlanconfig ath create wlandev wifi${WIFI_DEV} wlanmode ap
+        elif [ "${APTYPE}" = "2" ]; then #STA
+            wlanconfig ath0 create wlandev wifi${IFNUM} wlanmode sta nosbeacon
+        fi
+    fi
+    
+    if [ "${R_RADIOENA}" = "0" ]; then
+        echo "Radio is not up"
+        
+        i=0
+        eval wlan_main_Count='$'wlan_main_Count
+        while [ $i -lt $wlan_main_Count ]
+        do
+          find_vendor_from_index $i
+           if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+              find_ath_if_from_index $i
+              ifconfig ath${ATH_IF} down
+           fi
+           i=`expr $i + 1`
+        done
+        
+        ifconfig wifi${WIFI_DEV} down
+        exit
+    else
+        echo "Radio is up"
+        
+        ifconfig wifi${WIFI_DEV} up
+        echo "wifi interface wifi${WIFI_DEV} is up "
+        
+        i=0
+        eval wlan_main_Count='$'wlan_main_Count
+        while [ $i -lt $wlan_main_Count ]
+        do
+          find_vendor_from_index $i
+           if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+              eval tmpAPENABLE='$'wlmn_${i}_apEnable
+           
+              if [ "${tmpAPENABLE}" = "1" ]; then
+                 find_ath_if_from_index $i
+                 ifconfig ath${ATH_IF} up
+              fi
+           fi 
+           i=`expr $i + 1`
+        done
+    fi
+    
+    if [ "${APENABLE}" = "0" ]; then
+        echo "AP is not up"
+        
+        ifconfig ${APNAME} down
+        exit 
+    fi
+    
+    ifconfig ${APNAME} down
+    
+    #
+    # Country Setting
+    #    
+    CURRENT_CC=`iwpriv wifi${WIFI_DEV} getCountry | cut -d ":" -f 2 | cut -b 1-2`
+    if [ "${CURRENT_CC}" != "${COUNTRY}" ]; then
+        if [ "${ENVIRONMENT}" = "1" ]; then
+            iwpriv wifi${WIFI_DEV} setCountry $COUNTRY$INDOOR
+        elif [ "${ENVIRONMENT}" = "2" ]; then
+            iwpriv wifi${WIFI_DEV} setCountry $COUNTRY$OUTDOOR
+        else
+            iwpriv wifi${WIFI_DEV} setCountry $COUNTRY$ALLENV
+        fi
+    fi
+        
+    #
+    # Do the same for all instances of hostapd, wpa_supplicant, and wsc
+    #
+    HOSTAPD_VER=`hostapd_ath -v 2>&1 | grep hostapd | cut -f2 -d' '`
+    HOSTAPDLIST=`ps | grep /sbin/hostapd_ath | cut -b 1-5`
+    #echo " HOSTAPD_VER: $HOSTAPD_VER HOSTAPDLIST: $HOSTAPDLIST "
+    if [ "${HOSTAPDLIST}" != "" ]; then
+        for i in $HOSTAPDLIST ; do
+            #echo "killing $i"
+            kill $i
+        done
+    fi
+    
+    SUPPLIST=`ps | grep wpa_supplicant | cut -b 1-5`
+    if [ "${SUPPLIST}" != "" ]; then
+        for i in $SUPPLIST ; do
+            echo "killing $i"
+             kill $i
+         done
+    fi
+    sleep 4
+        
+    ##
+    ## For safety, delete all /tmp nodes we may re-create
+    ##
+    rm -rf /tmp/br*
+    rm -rf /tmp/aplist*
+    rm -rf /tmp/stalist*
+    rm -rf /tmp/topology*
+    rm -rf /tmp/sta_conf_filename
+    rm -rf /tmp/conf_filename
+    
+    if [ "${APTYPE}" = "2" ]; then #sta
+        APMODE="mode managed"
+    else
+        APMODE="mode master"
+    fi
+    if [ "${AUTOCHAN}" = "1" ]; then #auto freq
+        FREQ="freq 0"
+    else
+        FREQ="freq $PRICHAN"
+    fi
+    
+    if [ "${R_STANDARD}" = "0" ]; then #11bg
+        CH_MODE="11G"
+    elif [ "${R_STANDARD}" = "1" ]; then #11a
+        CH_MODE="11A"
+    elif [ "${R_STANDARD}" = "2" ]; then #11b
+        CH_MODE="11B"
+    elif [ "${R_STANDARD}" = "3" ]; then #11g
+        CH_MODE="11G"
+        PUREG=1
+    elif [ "${R_STANDARD}" = "4" -o  "${R_STANDARD}" = "5"  -o  "${R_STANDARD}" = "6" -o  "${R_STANDARD}" = "7" ]; then #11n
+        IS_11N=1
+        if [ "${R_STANDARD}" = "4" ]; then
+            PUREN=1
+        fi
+        if [ "${R_CHWIDTH}" = "0" -a "${R_BAND}" = "0" ]; then
+            CH_MODE="11NGHT20"
+        elif [ "${R_CHWIDTH}" = "0" -a "${R_BAND}" = "1" ]; then
+            CH_MODE="11NAHT20"
+        elif [ "${R_CHWIDTH}" = "1" -a "${R_BAND}" = "0" ]; then
+            if [ "${R_EXTOFFSET}" = "0" ]; then
+                CH_MODE="11NGHT40MINUS"
+            elif [ "${R_EXTOFFSET}" = "1" ]; then
+                CH_MODE="11NGHT40PLUS"
+            fi
+        elif [ "${R_CHWIDTH}" = "1" -a "${R_BAND}" = "1" ]; then
+            if [ "${R_EXTOFFSET}" = "0" ]; then
+                CH_MODE="11NAHT40MINUS"
+            elif [ "${R_EXTOFFSET}" = "1" ]; then
+                CH_MODE="11NAHT40PLUS"
+            fi
+        fi
+
+    elif [ "${R_STANDARD}" = "8" -o  "${R_STANDARD}" = "9"  -o  "${R_STANDARD}" = "10" ]; then #11n
+        IS_11AC=1
+        #CH_MODE="11ACVHT80"
+        if [ "${R_CHWIDTH}" = "0" -a "${R_BAND}" = "1" ]; then
+            CH_MODE="11ACVHT20"
+        elif [ "${R_CHWIDTH}" = "1" -a "${R_BAND}" = "1" ]; then
+            if [ "${R_EXTOFFSET}" = "0" ]; then
+                CH_MODE="11ACVHT40MINUS"
+            elif [ "${R_EXTOFFSET}" = "1" ]; then
+                CH_MODE="11ACVHT40PLUS"
+            fi
+        fi
+        CH_MODE="11ACVHT80"
+    fi
+    
+    if [ "${IS_11N}" = "1" ]; then
+        if [ "$R_SHORTGI" = "0" ]; then  
+            iwpriv ${APNAME} shortgi 1
+        elif [ "$R_SHORTGI" = "1" ]; then
+             iwpriv ${APNAME} shortgi 0
+        fi
+        
+        if ["${R_CHWIDTH}" = "1" -a "${R_BAND}" = "0"]; then
+	         iwpriv ${APNAME} disablecoext 1
+	      else
+	         iwpriv ${APNAME} disablecoext 0
+	      fi
+         
+        iwpriv ${APNAME} mode $CH_MODE
+            
+        BAND=`echo $CH_MODE | grep 11NG`
+    
+        if [ "${BAND}" != "" ]; then
+            iwpriv wifi$WIFI_DEV ForBiasAuto 1
+        fi
+    
+        iwpriv wifi$WIFI_DEV AMPDU $R_AMPDUENABLE    
+        iwpriv wifi$WIFI_DEV AMPDUFrames $R_AMPDUFRAMES
+        iwpriv wifi$WIFI_DEV AMPDULim $R_AMPDULIMIT
+        
+        iwpriv ${APNAME} pureg $PUREG
+        iwpriv ${APNAME} puren $PUREN
+      
+        if [ "$MCSRATE" != "-1" ]; then
+           if [ "$MCSRATE" = "0" ]; then
+                MANRATE="0x80808080"
+            elif [ "$MCSRATE" = "1" ]; then 
+                MANRATE="0x81818181"
+            elif [ "$MCSRATE" = "2" ]; then  
+                MANRATE="0x82828282"
+            elif [ "$MCSRATE" = "3" ]; then  
+               MANRATE="0x83838383"
+            elif [ "$MCSRATE" = "4" ]; then 
+               MANRATE="0x84848484"
+            elif [ "$MCSRATE" = "5" ]; then 
+               MANRATE="0x85858585"
+            elif [ "$MCSRATE" = "6" ]; then
+               MANRATE="0x86868686"
+            elif [ "$MCSRATE" = "7" ]; then 
+               MANRATE="0x87878787"
+            elif [ "$MCSRATE" = "8" ]; then  
+               MANRATE="0x88888888"
+            elif [ "$MCSRATE" = "9" ]; then 
+               MANRATE="0x89898989"
+            elif [ "$MCSRATE" = "10" ]; then
+               MANRATE="0x8a8a8a8a"
+            elif [ "$MCSRATE" = "11" ]; then  
+               MANRATE="0x8b8b8b8b"
+            elif [ "$MCSRATE" = "12" ]; then
+               MANRATE="0x8c8c8c8c"
+            elif [ "$MCSRATE" = "13" ]; then 
+               MANRATE="0x8d8d8d8d"
+            elif [ "$MCSRATE" = "14" ]; then  
+               MANRATE="0x8e8e8e8e"
+            elif [ "$MCSRATE" = "15" ]; then 
+               MANRATE="0x8f8f8f8f"
+            fi
+            MANRETRIES="0x04040404"
+            
+            iwpriv ${APNAME} set11NRates $MANRATE
+            iwpriv ${APNAME} set11NRetries $MANRETRIES
+	      elif [ "${AUTORATE}" = "0" -a  "${FIXRATE}" != "0" ]; then
+            if [ "$FIXRATE" = "1.0" ]; then
+                MANRATE="0x1b1b1b1b"
+            elif [ "$FIXRATE" = "2.0" ]; then
+                MANRATE="0x1a1a1a1a"
+            elif [ "$FIXRATE" = "5.5" ]; then
+                MANRATE="0x19191919"
+            elif [ "$FIXRATE" = "11.0" ]; then
+                MANRATE="0x18181818"
+            elif [ "$FIXRATE" = "6.0" ]; then
+                MANRATE="0x0b0b0b0b"
+            elif [ "$FIXRATE" = "9.0" ]; then
+                MANRATE="0x0f0f0f0f"
+            elif [ "$FIXRATE" = "12.0" ]; then
+                MANRATE="0x0a0a0a0a"
+            elif [ "$FIXRATE" = "18.0" ]; then
+                MANRATE="0x0e0e0e0e"
+            elif [ "$FIXRATE" = "24.0" ]; then
+                MANRATE="0x09090909"
+            elif [ "$FIXRATE" = "36.0" ]; then
+                MANRATE="0x0d0d0d0d"
+            elif [ "$FIXRATE" = "48.0" ]; then
+                MANRATE="0x08080808"
+            elif [ "$FIXRATE" = "54.0" ]; then
+                MANRATE="0x0c0c0c0c"
+            elif [ "$FIXRATE" = "81.0" ]; then
+                MANRATE="0x8a8a8a8a"
+            elif [ "$FIXRATE" = "108.0" ]; then
+                MANRATE="0x8b8b8b8b"
+            elif [ "$FIXRATE" = "162.0" ]; then
+                MANRATE="0x8c8c8c8c"
+            elif [ "$FIXRATE" = "216.0" ]; then
+                MANRATE="0x8d8d8d8d"
+            elif [ "$FIXRATE" = "243.0" ]; then
+                MANRATE="0x8e8e8e8e"
+            elif [ "$FIXRATE" = "270.0" ]; then
+                MANRATE="0x8f8f8f8f"
+            elif [ "$FIXRATE" = "300.0" ]; then
+                MANRATE="0x8f8f8f8f"
+            fi
+ 	          MANRETRIES="0x04040404"
+
+            iwpriv ${APNAME} set11NRates $MANRATE
+            iwpriv ${APNAME} set11NRetries $MANRETRIES
+        else
+            iwpriv ${APNAME} set11NRates 0x0
+        fi
+    
+        if [ "${R_TXCHAIN}" != "" -a "${R_TXCHAIN}" != "0" ]; then
+            iwpriv wifi$WIFI_DEV txchainmask $R_TXCHAIN
+    	  fi
+    
+        if [ "${R_RXCHAIN}" != ""  -a "${R_RXCHAIN}" != "0" ]; then
+            iwpriv wifi$WIFI_DEV rxchainmask $R_RXCHAIN
+        fi
+
+        iwconfig ${APNAME} essid "${ESSID}" ${APMODE} ${FREQ}
+    
+    elif [ "${IS_11AC}" = "1" ]; then
+
+        if [ "$R_SHORTGI" = "0" ]; then  
+            iwpriv ${APNAME} shortgi 1
+        elif [ "$R_SHORTGI" = "1" ]; then
+             iwpriv ${APNAME} shortgi 0
+        fi
+        
+        if ["${R_CHWIDTH}" = "1" -a "${R_BAND}" = "0"]; then
+	         iwpriv ${APNAME} disablecoext 1
+	      else
+	         iwpriv ${APNAME} disablecoext 0
+	      fi
+         
+        iwpriv ${APNAME} mode $CH_MODE
+            
+        #BAND=`echo $CH_MODE | grep 11AC`
+    
+        #if [ "${BAND}" != "" ]; then
+            #iwpriv wifi$WIFI_DEV ForBiasAuto 1
+        #fi
+    
+        #iwpriv wifi$WIFI_DEV AMPDU $R_AMPDUENABLE    
+        #iwpriv wifi$WIFI_DEV AMPDUFrames $R_AMPDUFRAMES
+        #iwpriv wifi$WIFI_DEV AMPDULim $R_AMPDULIMIT
+        
+        #iwpriv ${APNAME} pureg $PUREG
+        #iwpriv ${APNAME} puren $PUREN
+      
+        if [ "$MCSRATE" != "-1" ]; then
+           if [ "$MCSRATE" = "0" ]; then
+                MANRATE="0x80808080"
+            elif [ "$MCSRATE" = "1" ]; then 
+                MANRATE="0x81818181"
+            elif [ "$MCSRATE" = "2" ]; then  
+                MANRATE="0x82828282"
+            elif [ "$MCSRATE" = "3" ]; then  
+               MANRATE="0x83838383"
+            elif [ "$MCSRATE" = "4" ]; then 
+               MANRATE="0x84848484"
+            elif [ "$MCSRATE" = "5" ]; then 
+               MANRATE="0x85858585"
+            elif [ "$MCSRATE" = "6" ]; then
+               MANRATE="0x86868686"
+            elif [ "$MCSRATE" = "7" ]; then 
+               MANRATE="0x87878787"
+            elif [ "$MCSRATE" = "8" ]; then  
+               MANRATE="0x88888888"
+            elif [ "$MCSRATE" = "9" ]; then 
+               MANRATE="0x89898989"
+            elif [ "$MCSRATE" = "10" ]; then
+               MANRATE="0x8a8a8a8a"
+            elif [ "$MCSRATE" = "11" ]; then  
+               MANRATE="0x8b8b8b8b"
+            elif [ "$MCSRATE" = "12" ]; then
+               MANRATE="0x8c8c8c8c"
+            elif [ "$MCSRATE" = "13" ]; then 
+               MANRATE="0x8d8d8d8d"
+            elif [ "$MCSRATE" = "14" ]; then  
+               MANRATE="0x8e8e8e8e"
+            elif [ "$MCSRATE" = "15" ]; then 
+               MANRATE="0x8f8f8f8f"
+            fi
+            MANRETRIES="0x04040404"
+            
+            iwpriv ${APNAME} set11NRates $MANRATE
+            iwpriv ${APNAME} set11NRetries $MANRETRIES
+	      elif [ "${AUTORATE}" = "0" -a  "${FIXRATE}" != "0" ]; then
+            if [ "$FIXRATE" = "1.0" ]; then
+                MANRATE="0x1b"
+            elif [ "$FIXRATE" = "2.0" ]; then
+                MANRATE="0x1a"
+            elif [ "$FIXRATE" = "5.5" ]; then
+                MANRATE="0x19"
+            elif [ "$FIXRATE" = "11.0" ]; then
+                MANRATE="0x18"
+            elif [ "$FIXRATE" = "6.0" ]; then
+                MANRATE="0x0b"
+            elif [ "$FIXRATE" = "9.0" ]; then
+                MANRATE="0x0f"
+            elif [ "$FIXRATE" = "12.0" ]; then
+                MANRATE="0x0a"
+            elif [ "$FIXRATE" = "18.0" ]; then
+                MANRATE="0x0e"
+            elif [ "$FIXRATE" = "24.0" ]; then
+                MANRATE="0x09"
+            elif [ "$FIXRATE" = "36.0" ]; then
+                MANRATE="0x0d"
+            elif [ "$FIXRATE" = "48.0" ]; then
+                MANRATE="0x08"
+            elif [ "$FIXRATE" = "54.0" ]; then
+                MANRATE="0x0c"
+            elif [ "$FIXRATE" = "81.0" ]; then
+                MANRATE="0x8a"
+            elif [ "$FIXRATE" = "108.0" ]; then
+                MANRATE="0x8b"
+            elif [ "$FIXRATE" = "162.0" ]; then
+                MANRATE="0x8c"
+            elif [ "$FIXRATE" = "216.0" ]; then
+                MANRATE="0x8d"
+            elif [ "$FIXRATE" = "243.0" ]; then
+                MANRATE="0x8e"
+            elif [ "$FIXRATE" = "270.0" ]; then
+                MANRATE="0x8f"
+            elif [ "$FIXRATE" = "300.0" ]; then
+                MANRATE="0x8f"
+            fi
+  	        MANRETRIES="0x04040404"
+
+            iwpriv ${APNAME} set11NRates $MANRATE
+            iwpriv ${APNAME} set11NRetries $MANRETRIES
+        else
+            iwpriv ${APNAME} set11NRates 0x0
+        fi
+    
+        if [ "${R_TXCHAIN}" != "" -a "${R_TXCHAIN}" != "0" ]; then
+            iwpriv wifi$WIFI_DEV txchainmask $R_TXCHAIN
+    	  fi
+    
+        if [ "${R_RXCHAIN}" != ""  -a "${R_RXCHAIN}" != "0" ]; then
+            iwpriv wifi$WIFI_DEV rxchainmask $R_RXCHAIN
+        fi
+
+        iwconfig ${APNAME} essid "${ESSID}" ${APMODE} ${FREQ}
+
+    else    
+        iwpriv ${APNAME} mode ${CH_MODE}
+        iwconfig ${APNAME} essid "${ESSID}" ${APMODE} ${FREQ}
+        
+        if [ "${AUTORATE}" = "0" -a  "${FIXRATE}" != "0" ]; then
+            if [ "$FIXRATE" = "1.0" ]; then
+                MANRATE="0x1b1b1b1b"
+            elif [ "$FIXRATE" = "2.0" ]; then
+                MANRATE="0x1a1a1a1a"
+            elif [ "$FIXRATE" = "5.5" ]; then
+                MANRATE="0x19191919"
+            elif [ "$FIXRATE" = "11.0" ]; then
+                MANRATE="0x18181818"
+            elif [ "$FIXRATE" = "6.0" ]; then
+                MANRATE="0x0b0b0b0b"
+            elif [ "$FIXRATE" = "9.0" ]; then
+                MANRATE="0x0f0f0f0f"
+            elif [ "$FIXRATE" = "12.0" ]; then
+                MANRATE="0x0a0a0a0a"
+            elif [ "$FIXRATE" = "18.0" ]; then
+                MANRATE="0x0e0e0e0e"
+            elif [ "$FIXRATE" = "24.0" ]; then
+                MANRATE="0x09090909"
+            elif [ "$FIXRATE" = "36.0" ]; then
+                MANRATE="0x0d0d0d0d"
+            elif [ "$FIXRATE" = "48.0" ]; then
+                MANRATE="0x08080808"
+            elif [ "$FIXRATE" = "54.0" ]; then
+                MANRATE="0x0c0c0c0c"
+            fi      
+            MANRETRIES="0x04040404"
+                     
+            iwpriv ${APNAME} set11NRates $MANRATE
+            iwpriv ${APNAME} set11NRetries $MANRETRIES
+            
+            iwconfig ${APNAME} frag $FTS
+        fi    
+        
+    fi
+
+    if ["${R_PREAMBLE}" = "1" ]; then
+        iwpriv ${APNAME} shpreamble 1
+    else
+        iwpriv ${APNAME} shpreamble 0
+    fi
+
+    if [ "${RTS}" = "2347" ]; then
+        iwconfig ${APNAME} rts 2346
+    else
+        iwconfig ${APNAME} rts $RTS
+    fi
+    
+    if [ "${BEACONINT}" != "" ]; then
+        iwpriv ${APNAME} bintval ${BEACONINT}
+    fi
+
+    if [ "${DTIM_PERIOD}" != "" ]; then
+        iwpriv ${APNAME} dtim_period ${DTIM_PERIOD}
+    fi
+    
+    if [ "$R_POWERLVL" = "80" ]; then
+        iwconfig ${APNAME} txpower 12dbm
+    elif [ "$R_POWERLVL" = "60" ]; then
+    	iwconfig ${APNAME} txpower 9dbm
+    elif [ "$R_POWERLVL" = "40" ]; then
+    	iwconfig ${APNAME} txpower 6dbm	
+    elif [ "$R_POWERLVL" = "20" ]; then
+    	iwconfig ${APNAME} txpower 3dbm
+    fi
+    
+    i=0
+    eval MACCOUNT='$'wlan_mac_control_Count
+    if [ "$MACACL" = "2" ]; then #none
+        iwpriv ${APNAME} maccmd 4
+    elif [ "$MACACL" = "0" ]; then #allow
+        iwpriv ${APNAME} maccmd 3
+        while [ $i -lt $MACCOUNT ]
+        do
+           find_vendor_from_index $i
+           if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+                eval temp_pcpeId='$'wlmacctrl_${i}_pcpeId
+                eval temp_mac='$'wlmacctrl_${i}_macAddr
+                if [ "$temp_pcpeId" = "$pcpeId" ]; then
+                    iwpriv ${APNAME} addmac $temp_mac
+                fi
+           fi
+           i=`expr $i + 1`
+        done
+
+        iwpriv ${APNAME} maccmd 1
+    elif [ "$MACACL" = "1" ]; then #deny
+        iwpriv ${APNAME} maccmd 3
+        while [ $i -lt $MACCOUNT ]
+        do
+           find_vendor_from_index $i
+           if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+                eval temp_pcpeId='$'wlmacctrl_${i}_pcpeId
+                eval temp_mac='$'wlmacctrl_${i}_macAddr
+                if [ "$temp_pcpeId" = "$pcpeId" ]; then
+                    iwpriv ${APNAME} addmac $temp_mac
+                fi
+           fi
+           i=`expr $i + 1`
+        done
+
+        iwpriv ${APNAME} maccmd 2
+    fi
+
+    
+    if [ "$HIDENSSID" = "1" ]; then
+        iwpriv ${APNAME} hide_ssid 1
+    else
+        iwpriv ${APNAME} hide_ssid 0
+    fi
+    
+    if [ "$APISOENA" = "1" ]; then
+        iwpriv ${APNAME} ap_bridge 0
+    else
+        iwpriv ${APNAME} ap_bridge 1
+    fi
+            
+    if [ "$WDSENA" = "1" ]; then
+        iwpriv ${APNAME} wds 1
+    else
+        iwpriv ${APNAME} wds 0
+    fi
+
+    if [ "$WMMENA" = "1" ]; then
+        i=0
+    	eval pcpeId='$'wlmn_${WLMN_INDEX}_cpeId
+        while [ $i -lt 4 ]
+        do
+            eval ap_ECWmin='$'wlawmm${pcpeId}_${i}_ECWmin
+            if [ "$ap_ECWmin" != "" ]; then
+                iwpriv ${APNAME} cwmin ${i} 0 $ap_ECWmin
+            fi
+            eval ap_ECWmax='$'wlawmm${pcpeId}_${i}_ECWmax
+            if [ "$ap_ECWmax" != "" ]; then
+                iwpriv ${APNAME} cwmax ${i} 0 $ap_ECWmax
+            fi
+            eval ap_AIFSN='$'wlawmm${pcpeId}_${i}_AIFSN
+            if [ "$ap_AIFSN" != "" ]; then
+                iwpriv ${APNAME} aifs ${i} 0 $ap_AIFSN
+            fi
+            eval ap_TXOP='$'wlawmm${pcpeId}_${i}_TXOP
+            if [ "$ap_TXOP" != "" ]; then
+                iwpriv ${APNAME} txoplimit ${i} 0 $ap_TXOP
+            fi
+            eval ap_AckPolicy='$'wlawmm${pcpeId}_${i}_AckPolicy
+            if [ "$ap_AckPolicy" != "" ]; then
+                iwpriv ${APNAME} noackpolicy ${i} 0 $ap_AckPolicy
+            fi
+            eval ap_AdmCntrl='$'wlawmm${pcpeId}_${i}_AdmCntrl
+            if [ "$ap_AdmCntrl" != "" ]; then
+                iwpriv ${APNAME} acm ${i} 1 $ap_AdmCntrl
+            fi
+            eval bss_ECWmin='$'wlswmm${pcpeId}_${i}_ECWmin
+            if [ "$bss_ECWmin" != "" ]; then
+                iwpriv ${APNAME} cwmin ${i} 1 $bss_ECWmin
+            fi
+            eval bss_ECWmax='$'wlswmm${pcpeId}_${i}_ECWmax
+            if [ "$bss_ECWmax" != "" ]; then
+                iwpriv ${APNAME} cwmax ${i} 1 $bss_ECWmax
+            fi
+            eval bss_AIFSN='$'wlswmm${pcpeId}_${i}_AIFSN
+            if [ "$bss_AIFSN" != "" ]; then
+                iwpriv ${APNAME} aifs ${i} 1 $bss_AIFSN
+            fi
+            eval bss_TXOP='$'wlswmm${pcpeId}_${i}_TXOP
+            if [ "$bss_TXOP" != "" ]; then
+                iwpriv ${APNAME} txoplimit ${i} 1 $bss_TXOP
+            fi
+            eval bss_AckPolicy='$'wlswmm${pcpeId}_${i}_AckPolicy
+            if [ "$bss_AckPolicy" != "" ]; then
+                iwpriv ${APNAME} noackpolicy ${i} 1 $bss_AckPolicy
+            fi
+
+            i=`expr $i + 1`
+        done
+
+        iwpriv ${APNAME} wmm 1
+    else
+        iwpriv ${APNAME} wmm 0
+    fi
+
+    if [ "$UAPSDENA" = "1" ]; then
+        iwpriv ${APNAME} uapsd 1
+    else
+        iwpriv ${APNAME} uapsd 0
+    fi
+    
+    if [ "${APENABLE}" = "1" ]; then
+        ifconfig ${APNAME} up
+    fi
+    
+    IN_BRIDGE=`brctl show ${BRIDGE} | grep ${APNAME}`
+    if [ "$IN_BRIDGE" = "" ]; then
+        brctl addif ${BRIDGE} ${APNAME}
+    fi
+    
+    i=0
+    eval wlan_main_Count='$'wlan_main_Count
+    while [ $i -lt $wlan_main_Count ]
+    do
+        eval temp_APNAME=ath${i}
+        echo -e "\tinterface ${temp_APNAME}" >> /tmp/${BRIDGE}
+        i=`expr $i + 1`
+    done
+          
+    APINDEX=`echo ${APNAME}| cut -b 4-4`
+
+    if [ "$APINDEX" != "0" ]; then
+        APINDEX=`expr ${APINDEX} + 1`
+    fi
+    #echo "APINDEX: $APINDEX" 
+    RADIO=${IFNUM}
+    MODE=`iwconfig ${APNAME} | grep "Mode:Master"`
+    
+    if [ "${WPATYPE}" = "0" ]; then # Basic
+        SECMODE="None"
+        if [ "${ENCRTYPE}" = "1" ]; then # WEP
+    	    SECMODE="WEP"
+    	    eval pcpeId='$'wlsec_${WLMN_INDEX}_cpeId
+            eval WEPKEY_0='$'wlwep${pcpeId}_0_key
+            eval WEPKEY_1='$'wlwep${pcpeId}_1_key
+            eval WEPKEY_2='$'wlwep${pcpeId}_2_key
+            eval WEPKEY_3='$'wlwep${pcpeId}_3_key
+            
+            if [ "${RADIO}" = "0" ]; then
+            	cfg -a WEP_RADIO_NUM0_KEY_1=${WEPKEY_0}
+            	cfg -a WEP_RADIO_NUM0_KEY_2=${WEPKEY_1}
+            	cfg -a WEP_RADIO_NUM0_KEY_3=${WEPKEY_2}
+            	cfg -a WEP_RADIO_NUM0_KEY_4=${WEPKEY_3}
+            	cfg -a AP_PRIMARY_KEY_0=${WEPKEYINDEX}
+            	if [ "${AUTHTYPE}" = "0" ]; then
+                    cfg -a AP_WEP_MODE_0=1
+            	elif [ "${AUTHTYPE}" = "1" ]; then
+                    cfg -a AP_WEP_MODE_0=2
+                fi
+            else
+            	cfg -a WEP_RADIO_NUM1_KEY_1=${WEPKEY_0}
+            	cfg -a WEP_RADIO_NUM1_KEY_2=${WEPKEY_1}
+            	cfg -a WEP_RADIO_NUM1_KEY_3=${WEPKEY_2}
+            	cfg -a WEP_RADIO_NUM1_KEY_4=${WEPKEY_3}
+            	cfg -a AP_PRIMARY_KEY_1=${WEPKEYINDEX}
+            	if [ "${AUTHTYPE}" = "0" ]; then
+                    cfg -a AP_WEP_MODE_1=1
+            	elif [ "${AUTHTYPE}" = "1" ]; then
+                    cfg -a AP_WEP_MODE_1=2
+                fi
+            fi            	
+        fi
+    elif [ "${WPATYPE}" = "1" -o  "${WPATYPE}" = "2" -o "${WPATYPE}" = "3" ]; then
+        SECMODE="WPA"
+        if [ "${AUTHTYPE}" = "2" ]; then
+            SECFILE="EAP"
+	          i=0
+	          eval wlan_1x_Count='$'wlan_1x_Count
+	          eval pcpeId='$'wlsec_${WLMN_INDEX}_cpeId
+	          while [ $i -lt $wlan_1x_Count ]
+	          do		
+		          eval temp_pcpeId='$'wl1x_${i}_pcpeId
+		          if [ "$temp_pcpeId" = "$pcpeId" ]; then
+                    wl1x_cpeId=$i
+		          fi
+		          i=`expr $i + 1`
+	          done        	
+
+            eval GRPKEYENA='$'wl1x_${wl1x_cpeId}_grpKeyEna
+            eval GRPKEYINTVL='$'wl1x_${wl1x_cpeId}_grpKeyIntvl
+            eval WPA2PREAUTHENA='$'wl1x_${wl1x_cpeId}_wpa2PreAuthEna
+            eval RAAUTHINTVL='$'wl1x_${wl1x_cpeId}_reAuthIntvl
+            eval AUTHTYPE='$'wl1x_${wl1x_cpeId}_authType
+            eval AUTHPROTO='$'wl1x_${wl1x_cpeId}_authProto
+            eval RADIUSIP='$'wl1x_${wl1x_cpeId}_radiusIP
+            eval RADIUSPORT='$'wl1x_${wl1x_cpeId}_radiusPort
+            eval RADIUSSEC='$'wl1x_${wl1x_cpeId}_radiusSecret
+            eval DOMAINNAME='$'wl1x_${wl1x_cpeId}_domainName
+            eval USERNAME='$'wl1x_${wl1x_cpeId}_userName
+            if [ "${APINDEX}" = "0" ]; then
+            	cfg -a AP_EAP_REAUTH_PER=${RAAUTHINTVL}
+            	cfg -a AP_AUTH_SERVER=${RADIUSIP}
+            	cfg -a AP_AUTH_PORT=${RADIUSPORT}
+            	cfg -a AP_AUTH_SECRET=${RADIUSSEC}
+		          cfg -a AP_WPA_GROUP_REKEY=${GRPKEYINTVL}
+		          cfg -a AP_RSN_ENA_PREAUTH=${WPA2PREAUTHENA}
+            else
+            	cfg -a AP_EAP_REAUTH_PER_${APINDEX}=${RAAUTHINTVL}
+            	cfg -a AP_AUTH_SERVER_${APINDEX}=${RADIUSIP}
+            	cfg -a AP_AUTH_PORT_${APINDEX}=${RADIUSPORT}
+            	cfg -a AP_AUTH_SECRET_${APINDEX}=${RADIUSSEC}
+		          cfg -a AP_WPA_GROUP_REKEY_${APINDEX}=${GRPKEYINTVL}
+		          cfg -a AP_RSN_ENA_PREAUTH_${APINDEX}=${WPA2PREAUTHENA}
+            fi            	
+        else
+            SECFILE="PSK"
+            eval pcpeId='$'wlsec_${WLMN_INDEX}_cpeId
+            eval PSKFLAG='$'wlpsk${pcpeId}_0_pskFlag
+            eval PASSPHRASE='$'wlpsk${pcpeId}_0_passPhrase
+            eval PSK='$'wlpsk${pcpeId}_0_psk
+            if [ "$PSKFLAG" = "0" ]; then
+    	    	   if [ "${APINDEX}" = "0" ]; then
+                	cfg -a PSK_KEY=${PASSPHRASE}
+               else
+                	cfg -a PSK_KEY_${APINDEX}=${PASSPHRASE}
+               fi
+            else
+            	  if [ "${APINDEX}" = "0" ]; then
+                	cfg -a PSK_KEY=${PSK}
+                else
+                  cfg -a PSK_KEY_${APINDEX}=${PSK}
+                fi
+            fi
+        fi
+        
+        if [ "${ENCRTYPE}" = "2" ]; then
+            CYPHER="TKIP"
+        elif [ "${ENCRTYPE}" = "3" ]; then
+            CYPHER="CCMP"
+        elif [ "${ENCRTYPE}" = "4" ]; then
+            CYPHER="TKIP CCMP"
+        fi
+    fi
+    
+    if [ "${APINDEX}" = "0" ]; then
+        cfg -a AP_SSID=${ESSID}
+        cfg -a AP_SECMODE=${SECMODE}
+        cfg -a AP_SECFILE=${SECFILE}
+    	  cfg -a AP_WPA=${WPATYPE}
+    	  cfg -a AP_CYPHER="${CYPHER}"
+	      cfg -a WPS_ENABLE=${WPSENA}
+    else
+        cfg -a AP_SSID_${APINDEX}=${ESSID}
+        cfg -a AP_SECMODE_${APINDEX}=${SECMODE}
+        cfg -a AP_SECFILE_${APINDEX}=${SECFILE}
+    	  cfg -a AP_WPA_${APINDEX}=${WPATYPE}
+    	  cfg -a AP_CYPHER_${APINDEX}="${CYPHER}"
+	      cfg -a WPS_ENABLE_${APINDEX}=${WPSENA}
+    fi
+     #echo "ESSID $ESSID" 
+     #echo "WPSENA: $WPSENA"
+     #echo "SECMODE: $SECMODE  MODE: $MODE"
+    cfg -a AP_IPADDR=${IPADDR}
+    cfg -a AP_NETMASK=${NETMASK}
+    
+    if [ "${WPSENA}" = "1" ]; then
+    	echo ">>>>> WPS ENABLED, ${SECFILE} Mode : $MODE"
+        iwpriv ${APNAME} wps 1 
+        if [ "${MODE}" = "" ]; then  # STA mode
+                #
+                # For client mode and WPS is Enabled use WSC_sta.conf
+                #
+                echo "STA MODE"
+                fname="WSC_sta.conf"
+                fexist=`ls /tmp | grep ${fname}`
+                if [ "${fexist}" = "" ]; then
+                    cp /etc/ath/WSC_sta.conf /tmp
+                fi
+                echo -e "-c/tmp/WSC_sta.conf -i${APNAME} -bbr0" > /tmp/sta_conf_filename
+        else 
+                # for new hostapd
+                #echo "AP MODE"
+                fname="WSC_${APNAME}.conf"
+                fexist=`ls /tmp | grep ${APNAME}`
+                unconf=`cat /tmp/WSC_${APNAME}.conf | grep "^wps_state=2"`
+                if [ "${fexist}" = "" -o "${unconf}" = "" ]; then
+                    #
+                    # We have to use this file "in place" to have WSC work
+            	    # properly.
+            	    #
+            	    echo ">>>>> WPS Translate, Index:${APINDEX}"
+             	    cfg -t${APINDEX} /etc/ath/WSC.conf > /tmp/WSC_${APNAME}.conf
+                  sed -i -e 's/device_name=.*$/device_name='${APDEVNAME}'/g' /tmp/WSC_${APNAME}.conf
+         	fi
+        fi
+    else
+        if [ "${SECMODE}" = "WPA" ]; then
+            if [ "${MODE}" != "" ]; then
+                cfg -t${APINDEX} /etc/ath/${SECFILE}.ap_bss ${APNAME} > /tmp/sec${APNAME}
+            else
+                cfg -t${APINDEX} /etc/ath/${SECFILE}.sta ${APNAME} > /tmp/sup${APNAME}
+            fi
+        fi
+    
+     	  if [ "${SECMODE}" = "WEP" ]; then
+            eval pcpeId='$'wlsec_${1}_cpeId
+            eval WEPKEY_0='$'wlwep${pcpeId}_0_key
+            eval WEPKEY_1='$'wlwep${pcpeId}_1_key
+            eval WEPKEY_2='$'wlwep${pcpeId}_2_key
+            eval WEPKEY_3='$'wlwep${pcpeId}_3_key
+            
+            if [ "${WEPKEYMODE}" = "0" ]; then
+                iwconfig ${APNAME} key [1] s:$WEPKEY_0 
+                iwconfig ${APNAME} key [2] s:$WEPKEY_1
+                iwconfig ${APNAME} key [3] s:$WEPKEY_2
+                iwconfig ${APNAME} key [4] s:$WEPKEY_3
+            elif [ "${WEPKEYMODE}" = "1" ]; then
+                iwconfig ${APNAME} key [1] $WEPKEY_0
+                iwconfig ${APNAME} key [2] $WEPKEY_1
+                iwconfig ${APNAME} key [3] $WEPKEY_2
+                iwconfig ${APNAME} key [4] $WEPKEY_3
+            fi
+            
+            if [ "${AUTHTYPE}" = "0" ]; then
+                iwpriv ${APNAME} authmode 1 
+            elif [ "${AUTHTYPE}" = "1" ]; then
+                iwpriv ${APNAME} authmode 2
+            fi
+           
+            if [ "${WEPKEYINDEX}" = "0" ]; then
+                iwconfig ${APNAME} key [1]
+            elif [ "${WEPKEYINDEX}" = "1" ]; then
+                iwconfig ${APNAME} key [2]
+            elif [ "${WEPKEYINDEX}" = "2" ]; then
+                iwconfig ${APNAME} key [3]
+            elif [ "${WEPKEYINDEX}" = "3" ]; then
+                iwconfig ${APNAME} key [4]
+            fi
+        fi
+
+	      if [ "${SECMODE}" = "None" ]; then
+		      iwconfig ${APNAME} key off
+	      fi
+    fi
+ 
+    i=0
+    eval wlan_security_Count='$'wlan_security_Count
+    while [ $i -lt $wlan_security_Count ]
+    do
+
+      find_vendor_from_index $i
+      if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+      
+    	eval pcpeId='$'wlmn_${i}_cpeId
+    	eval temp_WPSENA='$'wlwps${pcpeId}_${WPS_INDEX}_enable
+    	eval temp_WPATYPE='$'wlsec_${i}_beaconType
+    	if [ "$temp_WPSENA" = "1" -o "$temp_WPATYPE" = "1" -o "$temp_WPATYPE" = "2" -o "$temp_WPATYPE" = "3" ]; then
+    	   if [ "${MODE}" != "" ]; then
+             find_ath_if_from_index $i
+             eval temp_APNAME=ath${ATH_IF}
+             if [ "$temp_WPSENA" = "1" ]; then
+                 eval temp_FNAME=WSC_${temp_APNAME}.conf
+             else
+                 eval temp_FNAME=sec${temp_APNAME}
+             fi
+             #echo "filename: ${temp_FNAME}"
+		         echo -e "/tmp/${temp_FNAME} \c\h" >> /tmp/conf_filename
+         else
+		         eval temp_APNAME=ath${i}
+             if [ "$temp_WPSENA" = "1" ]; then
+                 eval temp_FNAME=WSC_sta.conf
+             else
+                 eval temp_FNAME=sup${temp_APNAME}
+             fi
+
+             cp /etc/ath/${temp_FNAME} /tmp/${temp_FNAME}
+		         echo -e "-c/tmp/${temp_FNAME} -i${temp_APNAME} -b${BRIDGE}" > /tmp/sta_conf_filename
+         fi                   
+      fi
+      fi
+      i=`expr $i + 1`
+
+    done
+    
+    echo "Making Topology File . . ."
+    if [ -f /tmp/conf_filename ]; then
+        /sbin/hostapd_ath  -B `cat /tmp/conf_filename` -e /tmp/entropy
+       i=0
+       eval wlan_security_Count='$'wlan_security_Count
+       while [ $i -lt $wlan_security_Count ]
+       do
+          find_vendor_from_index $i
+          if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+    	       eval pcpeId='$'wlmn_${i}_cpeId
+    	       eval temp_WPSENA='$'wlwps${pcpeId}_${WPS_INDEX}_enable
+    	       if [ "$temp_WPSENA" = "1" ]; then
+                ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$pcpeId"`
+                #if [ "${ath_dev}" != "" ]; then
+                 #  /sbin/hostapd_cli -i${ath_dev} -a/etc/rc.d/ath_wlan_hostapd_events -B
+                #fi
+             fi
+          fi
+          i=`expr $i + 1`
+       done
+    fi
+    if [ -f /tmp/sta_conf_filename ]; then
+        wpa_supplicant `cat /tmp/sta_conf_filename` &
+    fi
+
+    iwpriv ath0 amsdu 3
+    iwpriv ath0 ampdu 64
+
+    ifconfig ${APNAME} up
+    if [ "$APNAME" == "ath0" ]; then
+        ppacmd addlan -i ${APNAME}
+        iwpriv ${APNAME} ppa 1
+    fi
+fi # ]

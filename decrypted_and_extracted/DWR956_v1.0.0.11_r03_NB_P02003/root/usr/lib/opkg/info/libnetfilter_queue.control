@@ -1,0 +1,14 @@
+Package: libnetfilter_queue
+Version: 1.0.2-1
+Depends: libmnl, libnfnetlink
+Provides: 
+Source: package/feeds/packages/net/libnetfilter_queue
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 7314
+Description:  libnetfilter_queue is a userspace library providing an API to packets
+ that have been queued by the kernel packet filter.

@@ -1,0 +1,13 @@
+Package: ifx-ethsw
+Version: 0.9.0-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_ethsw/ifx-ethsw
+Section: driver
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq GmbH
+Architecture: ltqcpe
+Installed-Size: 19759
+Description:  Ethernet Switch driver with ioctl support

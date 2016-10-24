@@ -1,0 +1,13 @@
+Package: inadyn
+Version: 1.99-4
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/inadyn
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 12103
+Description:  INADYN is a dynamic DNS client

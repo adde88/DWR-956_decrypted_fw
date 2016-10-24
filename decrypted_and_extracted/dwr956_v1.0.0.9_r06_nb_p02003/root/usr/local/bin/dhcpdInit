@@ -1,0 +1,70 @@
+#!/bin/sh
+
+if [ -e /tmp/udhcpd.pid ];then
+	#kill `cat /tmp/udhcpd.pid`
+	dwatchctl stop udhcpd
+	
+	if [ "$1" = "restart" ]; then # wait 10 sec for resetting PHY
+		rm -f /var/lib/misc/udhcpd.leases
+	fi
+fi
+
+NATENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from FirewallNatConfig;"`
+ENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from DhcpServerBasic where Id = '1';"`
+
+if [ "$ENABLE" = "1" -a "$NATENABLE" != "5" ]; then
+	LANIP=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select ipaddr from networkInterface where LogicalIfName = 'LAN1';"`
+	DOMAIN=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select domain from system;"`
+	STARTIP=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select StartIpAddress from DhcpServerBasic where Id = '1';"`
+	ENDIP=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select EndIpAddress from DhcpServerBasic where Id = '1';"`
+	MAX_LEASES=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Range from DhcpServerBasic where Id = '1';"`
+	LEASE_TIME=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select LeaseTime from DhcpServerBasic where Id = '1';"`
+	IPRESERV_ENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select IpReserveEnable from DhcpServerBasic where Id = '1';"`
+	SUBNET=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select subnetmask from networkInterface where LogicalIfName = 'LAN1';"`
+	INTERFACE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select interfaceName from networkInterface where LogicalIfName = 'LAN1';"`
+	sqlite3 -cmd ".timeout 1000" /tmp/system.db "select IpPhoneVendorID from DhcpServerBasic where Id = '1';" > /tmp/DHCP_VENDOR_LIST
+	
+	echo "start $STARTIP" > /etc/udhcpd.conf
+	echo "end $ENDIP" >> /etc/udhcpd.conf
+	echo "interface $INTERFACE" >> /etc/udhcpd.conf
+	#echo "dhcpmode 0" >> /etc/udhcpd.conf
+	echo "max_leases $MAX_LEASES" >> /etc/udhcpd.conf
+	#echo "auto_time 300" >> /etc/udhcpd.conf
+	echo "option router $LANIP" >> /etc/udhcpd.conf
+	echo "option dns $LANIP" >> /etc/udhcpd.conf
+	echo "option subnet $SUBNET" >> /etc/udhcpd.conf
+	echo "option domain $DOMAIN" >> /etc/udhcpd.conf
+	echo "option lease $LEASE_TIME" >> /etc/udhcpd.conf
+	echo "pidfile /tmp/udhcpd.pid" >> /etc/udhcpd.conf
+
+	if [ "$IPRESERV_ENABLE" = "1" ]; then
+		FixIpCnt=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select count(*) from DhcpfixedIpAddress;"`
+		if [ "$FixIpCnt" -ne 0 ]; then
+			i=1
+			while [ $i -le $FixIpCnt ]
+			do
+				FIXEN=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from DhcpfixedIpAddress where _ROWID_='$i';"`
+				if [ "$FIXEN" = "1" ]; then
+					FIXIP=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select IpAddr from DhcpfixedIpAddress where _ROWID_='$i';"`
+					FIXMAC=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select MacAddr from DhcpfixedIpAddress where _ROWID_='$i';"`
+					echo "static_lease $FIXMAC $FIXIP " >> /etc/udhcpd.conf
+				fi
+				i=`expr $i + 1`
+			done
+		fi
+	fi
+	
+	dwatchctl add CMD="udhcpd -S /etc/udhcpd.conf" KEYNAME=udhcpd DELAY=10
+	dwatchctl start udhcpd
+fi
+
+if [ "$1" = "restart" ]; then # wait 10 sec for resetting PHY
+	# disable PHY first
+	/etc/init.d/disablePHY start
+
+	sleep 10
+	
+	# enable PHY last
+	/etc/init.d/enablePHY start
+fi
+

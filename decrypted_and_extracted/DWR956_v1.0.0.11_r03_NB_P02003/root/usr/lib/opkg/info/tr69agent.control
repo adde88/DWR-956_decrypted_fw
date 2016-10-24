@@ -1,0 +1,13 @@
+Package: tr69agent
+Version: 20130617-1
+Depends: libtr069, libjnrpsql
+Provides: 
+Source: package/wnc-packages/tr69agent
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 53592
+Description:  This package contains tr69agent

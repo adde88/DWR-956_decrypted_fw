@@ -1,0 +1,8 @@
+#!/bin/sh /etc/rc.common
+
+START=65
+
+start() {
+	/etc/init.d/dwatch start
+	[ -e /usr/local/bin/lanInit ]                && lanInit
+}

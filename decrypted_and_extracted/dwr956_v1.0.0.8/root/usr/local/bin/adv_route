@@ -1,0 +1,118 @@
+#!/bin/sh
+
+mask2cidr() {
+    nbits=0
+    IFS=.
+    for dec in $1 ; do
+        case $dec in
+            255) let nbits+=8;;
+            254) let nbits+=7;;
+            252) let nbits+=6;;
+            248) let nbits+=5;;
+            240) let nbits+=4;;
+            224) let nbits+=3;;
+            192) let nbits+=2;;
+            128) let nbits+=1;;
+            0);;
+            *) echo "Error: $dec is not recognised"; exit 1
+        esac
+    done
+    echo "$nbits"
+}
+
+ADV_ROUTE_LOCK=/tmp/adv_route_lock${2}
+if [ -e $ADV_ROUTE_LOCK ]; then	
+	return
+else
+	echo "1" > $ADV_ROUTE_LOCK
+fi
+
+IP1=`grep 'ip ' /tmp/dhcpc_$2.result | cut -d' ' -f2 | tail -1`
+MASK1=`grep 'netmask ' /tmp/dhcpc_$2.result | cut -d' ' -f2 | tail -1`
+GW1=`grep 'gateway ' /tmp/dhcpc_$2.result | cut -d' ' -f2 | tail -1`
+
+if [ "$2" = "usb0" ] ; then
+    TABLE1=10
+elif [ "$2" = "usb1" ] ; then
+    TABLE1=20
+else
+    TABLE1=30
+fi
+IP1_MASK=$(mask2cidr $MASK1)
+IP1_NET=`/bin/ipcalc.sh $IP1/$IP1_MASK | grep NETWORK | sed '1s/NETWORK=//'`
+
+#LANIP=`sqlite3 /tmp/system.db "select ipaddr from networkInterface where LogicalIfName = 'LAN1';"`
+LANIP=`grep "config.Lan\[1\]\[\"IpAddress\"\]" /sysconfig/jnr-cfg.ascii | awk -F"\"" '{print $4}'`
+LANIP_1=`echo $LANIP | cut -d. -f1`
+LANIP_2=`echo $LANIP | cut -d. -f2`
+LANIP_3=`echo $LANIP | cut -d. -f3`
+LANIP=${LANIP_1}.${LANIP_2}.${LANIP_3}.0
+LAN_NET=`/bin/ipcalc.sh $LANIP/24 | grep NETWORK | sed '1s/NETWORK=//'`
+
+if [ "$1" == "start" ] ; then 
+
+	ip route flush table $TABLE1
+	ip rule del table $TABLE1
+
+    if [ "$2" = "usb0" ] ; then
+        echo "0" > /proc/sys/net/ipv4/conf/usb0/rp_filter
+    elif [ "$2" = "usb1" ] ; then
+        echo "0" > /proc/sys/net/ipv4/conf/usb1/rp_filter
+    else
+        echo "0" > /proc/sys/net/ipv4/conf/usb2/rp_filter
+    fi
+	    
+	# routing table TABLE
+	ip route add $IP1_NET/$IP1_MASK dev $2 src $IP1 table $TABLE1
+	ip route add default via $GW1 dev $2 src $IP1 table $TABLE1	
+  
+	# direct neighbor
+	ip route add $IP1_NET/$IP1_MASK dev $2 src $IP1
+  
+	ip rule add from $IP1 table $TABLE1
+  
+	# routing table TABLE1
+	ip route add $LAN_NET/24 dev br0 table $TABLE1
+	ip route add $IP1_NET/$IP1_MASK dev $2 table $TABLE1
+	ip route add 127.0.0.0/8 dev lo table $TABLE1
+
+	# read ip_phone_list and add to ip rule
+	if [ "$2" = "usb1" ] && [ -e /tmp/ip_phone_list ]; then
+		cat /tmp/ip_phone_list | while read line
+		do
+			if [ "_$line" != "_" ];then
+				ip rule add from $line table $TABLE1
+			fi
+		done 
+	fi
+    
+	ip route flush cache
+	
+	rm -f $ADV_ROUTE_LOCK
+  
+elif [ "$1" == "stop" ] ; then 
+ 
+	ip route flush table $TABLE1
+
+	# read ip_phone_list and delete with ip rule
+	if [ "$2" = "usb1" ] && [ -e /tmp/ip_phone_list ]; then
+		cat /tmp/ip_phone_list | while read line
+		do
+			if [ "_$line" != "_" ];then
+				ip rule del from $line table $TABLE1
+			fi
+		done 
+	fi
+	
+	ip rule del table $TABLE1
+   
+	ip route flush cache
+	
+	rm -f $ADV_ROUTE_LOCK
+else 
+	echo "The usage of rtb_setup"
+	echo "Usage [ start ]: rtb_setup start ip1 ip1_mask ip1_gw ip2 ip2_mask ip2_gw ip2_pdns ip2_sdns"
+	echo "Usage [ stop  ]: rtb_setup stop ip1 ip1_mask ip1_gw ip2 ip2_mask ip2_gw ip2_pdns ip2_sdns"
+
+	rm -f $ADV_ROUTE_LOCK	
+fi

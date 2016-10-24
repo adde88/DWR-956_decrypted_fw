@@ -1,0 +1,13 @@
+Package: libstdcpp
+Version: 4.3.3+cs-43.32
+Depends: 
+Provides: 
+Source: package/base-files
+Section: libs
+Status: unknown hold not-installed
+Essential: yes
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 233953
+Description:  GNU Standard C++ Library v3

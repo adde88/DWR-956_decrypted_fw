@@ -1,0 +1,118 @@
+#!/bin/sh
+# 000001:tc.chen 2005/06/07 add 802.1p and ip ptos support. rewrite all of the qos scirpts
+#509143:linmars remove unnecessary script
+#060906:sharontseng add to support Atheros driver into bridge mode.
+
+echo "Env $ENVLOADED" > /dev/null
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+platform=${CONFIG_IFX_MODEL_NAME%%_*}
+if [ "$platform" = "DANUBE" -o "$platform" = "AMAZON" -o "$platform" = "TP-VE" -o "$platform" = "GW188" ]; then
+	target=$platform
+else
+	target=`echo $platform | cut -c -4`
+fi
+
+
+echo "UTC0" > /etc/TZ
+if [ -n "$CONFIG_TARGET_LTQCPE_PLATFORM_AR9_VB" ]; then
+	# store board mac address
+	/usr/sbin/status_oper SET dev_info mac_addr "`/usr/sbin/upgrade mac_get 0`"
+	[ `mount|grep -q nfs;echo $?` -eq  0 ] || ifconfig eth1 down
+	[ `mount|grep -q nfs;echo $?` -eq  0 ] || ifconfig eth1 hw ether `/usr/sbin/upgrade mac_get 0`
+	[ `mount|grep -q nfs;echo $?` -eq  0 ] || ifconfig eth1 0.0.0.0 up
+else
+	# store board mac address
+	/usr/sbin/status_oper SET dev_info mac_addr "`/usr/sbin/upgrade	mac_get 0`"
+	[ `mount|grep -q nfs;echo $?` -eq  0 ] || ifconfig eth0 down
+	[ `mount|grep -q nfs;echo $?` -eq  0 ] || ifconfig eth0	hw ether `/usr/sbin/upgrade mac_get 0 | /usr/sbin/next_macaddr -1`
+	[ `mount|grep -q nfs;echo $?` -eq  0 ] || ifconfig eth0 0.0.0.0 up
+fi
+
+eval g_wan_phy_mode='$'wanphy_phymode
+eval g_wan_tc_mode='$'wanphy_tc
+	
+if [ "$g_wan_phy_mode" = "0" -a "$g_wan_tc_mode" = "0" ]; then # ADSL and ATM
+	startFlag=1
+elif [ "$g_wan_phy_mode" = "0" -o "$g_wan_phy_mode" = "3" ]; then # ADSL/VDSL and PTM
+	if [ "$g_wan_tc_mode" = "1" ]; then # ADSL/VDSL and PTM
+		startFlag=1
+	fi
+elif [ "$g_wan_phy_mode" = "2" ]; then # Eth on MII1
+	startFlag=1
+fi
+	
+if [ -n "$startFlag" -a "$startFlag" = "1" ]; then
+	if [ "$STP_Bridge_ENABLE" = "1" ]; then
+		/usr/sbin/brctl stp br0 on
+	else
+		/usr/sbin/brctl stp br0 off
+	fi
+fi
+
+if [ -n "$CONFIG_TARGET_LTQCPE_PLATFORM_AR9_VB" -o -n "$CONFIG_TARGET_LTQCPE_PLATFORM_VBG400" ]; then
+	# EPHY configuration
+	i=0
+	while [ $i -lt $eth_phy_if_Count ]
+	do
+		eval ephyIfName='$'ephy_${i}_ifName
+		eval ephyFlowCtrl='$'ephy_${i}_flowCntrl
+		if [ "$ephyFlowCtrl" = "1" ]; then #enable flow control
+			/usr/sbin/ethtool -A $ephyIfName autoneg on rx on tx on
+		else
+			/usr/sbin/ethtool -A $ephyIfName rx off tx off
+		fi
+
+		eval ephySpeed='$'ephy_${i}_speed
+		if [ "$ephySpeed" = "2" ]; then #advertise PHY rate 1GBit
+			/usr/sbin/ethtool -s $ephyIfName advertise 0x3f
+		elif [ "$ephySpeed" = "1" ]; then #advertise PHY rate 100MBit
+			/usr/sbin/ethtool -s $ephyIfName advertise 0xf
+		else
+			/usr/sbin/ethtool -s $ephyIfName advertise 0xf
+		fi
+
+		i=$(( $i + 1 ))
+	done
+else
+	# Disable execution of this script if NFS is enabled
+	cat /proc/mounts | grep nfs > /dev/null
+	if [ $? = 1 ]; then	
+		#NFS is disabled
+		. /etc/init.d/ltq_switch_config.sh do_switch_config
+	fi
+fi		
+
+
+# PPA 
+if [ "A$CONFIG_FEATURE_PPA_SUPPORT" = "A1" ]; then
+	. /etc/rc.d/get_lan_if
+	eval fenable='$'lan_main_0_fEnable
+	if [ "$fenable" = "1" ]; then
+		/etc/rc.d/ppa_config.sh addlan $LAN_IFNAME
+	fi
+	if [ "$g_wan_phy_mode" = "1" ]; then # Eth on MII0
+		#/etc/rc.d/ppa_config.sh addlan eth0.$lan_vid_all
+		/etc/rc.d/ppa_config.sh addlan eth0.501 #hardcoding because lan_vid_all is not available in this script
+	else
+		if [ -n "$CONFIG_TARGET_LTQCPE_PLATFORM_AR9_VB" ]; then
+			/etc/rc.d/ppa_config.sh addlan eth1
+		else
+			/etc/rc.d/ppa_config.sh addlan eth0
+		fi
+	fi
+fi
+
+

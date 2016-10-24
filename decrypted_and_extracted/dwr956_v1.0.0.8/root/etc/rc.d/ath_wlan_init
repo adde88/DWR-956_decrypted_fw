@@ -1,0 +1,61 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    #
+    # Determine if the modules are already up.  If so, simply
+    # exit without error.
+    #
+
+    MODLIST=`cat /proc/modules | grep ath_hal | cut -f1,0 -d" "`
+    
+    if [ "${MODLIST}" = "ath_hal" ]; then
+        echo "AP is already up"
+        exit
+    fi
+
+    echo 1 > /proc/sys/vm/drop_caches; sleep 1
+    sync
+    
+    #Insert wireless module, independent from configuration state    
+    insmod /lib/modules/`uname -r`/net/adf.ko
+    insmod /lib/modules/`uname -r`/net/asf.ko
+    if [ "$CONFIG_FEATURE_ATHEROS_WLAN_TYPE_USB" = "1" ]; then
+        insmod /lib/modules/`uname -r`/net/ath_hif_usb.ko
+        insmod /lib/modules/`uname -r`/net/ath_htc_hst.ko
+    fi
+    insmod /lib/modules/`uname -r`/net/ath_hal.ko
+    insmod /lib/modules/`uname -r`/net/ath_rate_atheros.ko
+    insmod /lib/modules/`uname -r`/net/ath_dfs.ko
+    insmod /lib/modules/`uname -r`/net/ath_dev.ko
+    insmod /lib/modules/`uname -r`/net/umac.ko
+    insmod /lib/modules/`uname -r`/net/ath_pktlog.ko
+    if [ "$CONFIG_FEATURE_ATHEROS_WLAN_TYPE_USB" = "1" ]; then
+        insmod /lib/modules/`uname -r`/net/ath_usbdrv.ko
+    fi 
+fi
+
+# Set the MAC address
+AC_MAC_ADDR="`/usr/sbin/upgrade mac_get 0 | /usr/sbin/next_macaddr -3`"
+if [ "$AC_MAC_ADDR" == "00:00:00:00:00:00" ]; then
+	# set a default
+	AC_MAC_ADDR=00:03:07:11:22:33
+fi
+
+iwpriv wifi0 setHwaddr $AC_MAC_ADDR
+
+
+

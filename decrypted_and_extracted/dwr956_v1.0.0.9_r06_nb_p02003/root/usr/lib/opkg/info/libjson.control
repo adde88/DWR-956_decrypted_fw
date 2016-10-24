@@ -1,0 +1,14 @@
+Package: libjson
+Version: 0.11-2
+Depends: libjson-c
+Provides: 
+Source: package/libjson-c
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 1122
+Description:  This package contains a compatibility library for packages that have not
+ been adapted to the json-c library rename yet

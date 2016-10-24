@@ -1,0 +1,13 @@
+Package: mtd-utils-nandwrite
+Version: 1.4.6-1
+Depends: mtd-utils, zlib, libuuid
+Provides: 
+Source: package/feeds/open_applications/mtd-utils
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 14667
+Description:  MTD nandwrite

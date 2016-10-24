@@ -1,0 +1,387 @@
+#!/bin/sh
+WIFI_SETTING=`cat /tmp/wifisetting_11n`
+if [ "$WIFI_SETTING" == "1" ]; then
+	echo "WIFI 11n setting is running"
+	exit 0 
+else
+	echo 1 > /tmp/wifisetting_11n
+fi 
+WLANIf_1="wlan0"
+WLANIf_2="wlan0.0"
+# LED interface
+WLAN_IF=""
+WLANCONF_1="/tmp/hostapd_1.conf"
+WLANCONF_2="/tmp/hostapd_2.conf"
+#config.wifiProfile[1]["pskPassAscii"] = "1234567890"
+#config.wifiProfile[1]["security"] = "WPA2"
+# assume vap1/2 already bring up by platform already. So turn-off now.
+ifconfig $WLANIf_1 down
+ifconfig $WLANIf_2 down
+# reset the STA old information 
+killall hostapd
+rm /tmp/conf_filename
+# turn off the WIFI 2.4GHz LED
+echo 0 > /sys/devices/virtual/leds/WIFI_2G_ON/brightness
+echo 0 > /tmp/wps_state
+# initial the WIFI WPS status
+sqlite3 -cmd ".timeout 1000" /tmp/system.db "update wifiStatus set WPSStatus='Disable' where profileName='wlan1'"
+sleep 3 
+AOCS_Debug=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select debugFlag from wifiAOCSstatus where profileName = 'wifiAOCS';"`
+[ "$AOCS_Debug" != "0" ] && echo "AOCS start"
+# run WIFI active Scan
+/usr/local/bin/wifiActScan.sh
+# Access the database
+WLANEn_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wlanEnabled from wifiAP where wlanName = 'ap1';"`
+WLANEn_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wlanEnabled from wifiAP where wlanName = 'ap2';"`
+
+WLANBeacon=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select beaconInterval from wifiAP where wlanName= 'ap1';"`
+WLANRTSTh=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select rtsThreshold from wifiAP where wlanName= 'ap1';"`
+echo "WLANBeacon=$WLANBeacon"
+echo "WLANRTSTh=$WLANRTSTh"
+WLANCh=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select configuredChannel from wifiRadio where radioNo = '1';"`
+WLANNetMode=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select opMode from wifiRadio where radioNo = '1';"`
+WLANFortyMode=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select chanWidth from wifiRadio where radioNo = '1';"`
+WLANBoningCh=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select sideBand from wifiRadio where radioNo = '1';"`
+WLANTxoffset=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select txPower from wifiRadio where radioNo = '1';"`
+echo "WLANCh=$WLANCh"
+echo "WLANNetMode=$WLANNetMode"
+echo "WLANFortyMode=$WLANFortyMode"
+echo "WLANBoningCh=$WLANBoningCh"
+echo "WLANTxoffset=$WLANTxoffset"
+# Setting the hidden SSID, for Hidden SSID
+WLANBCAST_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select broadcastSSID from wifiProfile where profileName = 'wlan1';"`
+WLANBCAST_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select broadcastSSID from wifiProfile where profileName = 'wlan2';"`
+WLANisN=0
+# convert the WLANNetMode to integer 
+if [ "${WLANNetMode}" = "b" ]; then
+    WLANNetMode_int=17
+elif [ "${WLANNetMode}" = "g" ]; then
+    WLANNetMode_int=18
+elif [ "${WLANNetMode}" = "bg" ]; then
+    WLANNetMode_int=19
+elif [ "${WLANNetMode}" = "n" ]; then
+    WLANNetMode_int=20
+    WLANisN=1
+elif [ "${WLANNetMode}" = "gn" ]; then
+    WLANNetMode_int=22
+    WLANisN=1
+elif [ "${WLANNetMode}" = "bgn" ]; then
+    WLANNetMode_int=23
+    WLANisN=1
+else
+    # Setting the default value
+    WLANNetMode_int=23
+    WLANisN=1
+fi 
+echo "WLANNetMode_int=$WLANNetMode_int"
+
+# Setting the common driver capability
+# setting radio mode
+iwpriv wlan0 sNetworkMode $WLANNetMode_int
+iwpriv wlan0.0 sNetworkMode $WLANNetMode_int
+# setting the beacon interval
+iwpriv wlan0 sBeaconPeriod $WLANBeacon
+iwconfig wlan0 rts $WLANRTSTh
+
+# setting channel bandwidth
+if [ "${WLANFortyMode}" == "2040" ]; then
+	WLANFortyMode_int=1
+else 
+	WLANFortyMode_int=0
+fi
+iwpriv $WLANIf_1 sFortyMHzOpMode $WLANFortyMode_int
+echo "WLANFortyMode_int=$WLANFortyMode_int"
+
+# setting bonding channel
+if [ "$WLANisN" = "1" -a "$WLANFortyMode_int" = "1" ]; then
+	iwpriv wlan0 sCoexMode 0
+	iwpriv wlan0 sAocsIsEnabled 0
+	iwpriv wlan0 sAocsBonding $WLANBoningCh
+fi
+# setting channel
+# channel range 5~13 (upper), 1~9 (lower), 0=auto
+iwconfig $WLANIf_1 channel $WLANCh
+
+# Tx compensation
+iwpriv $WLANIf_1 sPowerSelection $WLANTxoffset
+
+# Set WIFI Country code to Norway
+iwpriv wlan0 sCountry NO
+	
+# Apply SSID anyway, for manufacture
+WLANSSID_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select ssid from wifiProfile where profileName = 'wlan1';"`
+iwconfig $WLANIf_1 essid $WLANSSID_1
+
+#if [ "$WLANEn_1" != "0" ]; then
+	WLANSEC_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select security from wifiProfile where profileName = 'wlan1';"`
+	WLANPSKASCII_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select pskPassAscii from wifiProfile where profileName = 'wlan1';"`
+	WLANWEPKEY_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wepkey0 from wifiProfile where profileName = 'wlan1';"`
+
+	if [ "$WLANEn_1" != "0" ]; then
+		WLAN_IF=$WLANIf_1
+	fi
+
+	if [ "$WLANBCAST_1" != "0" ]; then
+		iwpriv $WLANIf_1 sHiddenSSID 0
+	else
+		iwpriv $WLANIf_1 sHiddenSSID 1
+	fi
+	
+	# security settings
+	if [ "$WLANSEC_1" == "WEP" ]; then
+		echo "Encryption mode is set to WEP"
+		#if [ "$WLANisN" != "1" ]; then
+		if [ "$WLANNetMode_int" == "23" ]; then
+		    iwpriv wlan0 sNetworkMode 19
+		    #WLANisN=0
+		fi 
+		    iwconfig $WLANIf_1 key off
+		    iwconfig $WLANIf_1 key open
+		# To Do : dectect the wepkey length
+		    WEPLEN=${#WLANWEPKEY_1}
+	    	    if [ "$WEPLEN" = "5" -o "$WEPLEN" = "13" ]; then
+		   	# this is ascii lenght	
+			iwconfig $WLANIf_1 key [1] s:${WLANWEPKEY_1}	
+		    else
+			# the is hex lenght
+			iwconfig $WLANIf_1 key [1] ${WLANWEPKEY_1}
+		    fi
+		    echo "WEPLEN=$WEPLEN"
+		    iwconfig $WLANIf_1 key [1]
+		if [ "$WLANEn_1" != "0" ]; then
+		    ifconfig $WLANIf_1 up
+		# Turn on the WIFI 2.4G LED
+		    echo 1 > /sys/devices/virtual/leds/WIFI_2G_ON/brightness
+	            echo netdev > /sys/devices/virtual/leds/WIFI_2G_ON/trigger
+                    echo $WLAN_IF  > /sys/devices/virtual/leds/WIFI_2G_ON/device_name
+                    echo "link tx" > /sys/devices/virtual/leds/WIFI_2G_ON/mode
+                    echo 125 > /sys/devices/virtual/leds/WIFI_2G_ON/interval
+		fi
+		#fi
+	else
+		
+
+		echo "interface=wlan0" > $WLANCONF_1
+		echo "bridge=br0" >> $WLANCONF_1
+		echo "driver=mtlk" >> $WLANCONF_1
+		echo "ssid=${WLANSSID_1}" >> $WLANCONF_1
+		echo "macaddr_acl=0" >> $WLANCONF_1
+		echo "wpa_key_mgmt=WPA-PSK" >> $WLANCONF_1
+	        # parse the WPA key length	
+		WPALEN=${#WLANPSKASCII_1}
+		if [ "$WPALEN" = "64" ]; then
+			echo "wpa_psk=${WLANPSKASCII_1}" >> $WLANCONF_1
+		else
+			echo "wpa_passphrase=${WLANPSKASCII_1}" >> $WLANCONF_1
+		fi
+		echo "wpa_group_rekey=600" >> $WLANCONF_1
+		echo "wpa_gmk_rekey=86400" >> $WLANCONF_1
+		echo "ctrl_interface=/var/run/hostapd" >> $WLANCONF_1
+		
+		if [ "$WLANSEC_1" == "OPEN" ]; then
+			#run hostapd on open mode, for the WPS feature
+			echo "wpa=0" >> $WLANCONF_1
+			echo "wpa_pairwise=CCMP" >> $WLANCONF_1
+		elif [ "$WLANSEC_1" == "WPA" ]; then
+			echo "wpa=1" >> $WLANCONF_1
+    		      	if [ "$WLANisN" = "1" ]; then
+			    echo "wpa_pairwise=CCMP" >> $WLANCONF_1
+			else 
+			    echo "wpa_pairwise=TKIP" >> $WLANCONF_1
+			fi
+		elif [ "$WLANSEC_1" == "WPA2" ]; then
+			echo "wpa=2" >> $WLANCONF_1
+			echo "wpa_pairwise=CCMP" >> $WLANCONF_1
+		elif [ "$WLANSEC_1" == "WPAWPA2" ]; then
+			echo "wpa=3" >> $WLANCONF_1
+			echo "wpa_pairwise=TKIP CCMP" >> $WLANCONF_1
+		fi
+		echo -e "$WLANCONF_1 \c\h" >> /tmp/conf_filename
+	fi
+#fi
+
+
+# Apply SSID2.
+WLANSSID_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select ssid from wifiProfile where profileName = 'wlan2';"`
+iwconfig $WLANIf_2 essid $WLANSSID_2
+#if [ "$WLANEn_2" != "0" ]; then
+	WLANSEC_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select security from wifiProfile where profileName = 'wlan2';"`
+	WLANPSKASCII_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select pskPassAscii from wifiProfile where profileName = 'wlan2';"`
+	WLANWEPKEY_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wepkey0 from wifiProfile where profileName = 'wlan2';"`
+	NATENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from FirewallNatConfig;"`	
+	if [ "$WLAN_IF" = "" -a "$WLANEn_2" != "0" ]; then
+	    WLAN_IF=$WLANIf_2
+	fi 
+
+	if [ "$WLANBCAST_2" != "0" ]; then
+		iwpriv $WLANIf_2 sHiddenSSID 0
+	else
+		iwpriv $WLANIf_2 sHiddenSSID 1
+	fi
+
+        # security settings
+        if [ "$WLANSEC_2" == "WEP" ]; then
+                echo "Encryption mode is set to WEP"
+                #if [ "$WLANisN" != "1" ]; then
+                if [ "$WLANNetMode_int" == "23" ]; then
+                    iwpriv wlan0.0 sNetworkMode 19
+                    #WLANisN=0
+                fi
+		    iwconfig $WLANIf_2 key off
+                    iwconfig $WLANIf_2 key open
+                # To Do : dectect the wepkey length
+                    WEPLEN_2=${#WLANWEPKEY_2}
+                    if [ "$WEPLEN_2" = "5" -o "$WEPLEN_2" = "13" ]; then
+                        # this is ascii lenght
+                        iwconfig $WLANIf_2 key [1] s:${WLANWEPKEY_2}
+                    else
+                        # the is hex lenght
+                        iwconfig $WLANIf_2 key [1] ${WLANWEPKEY_2}
+                    fi
+                    echo "WEPLEN_2=$WEPLEN_2"
+                    iwconfig $WLANIf_2 key [1]
+		    
+		    if [ "$WLANEn_2" != "0" ]; then
+                        ifconfig $WLANIf_2 up
+		# Turn on the WIFI 2.4G LED
+		        echo 1 > /sys/devices/virtual/leds/WIFI_2G_ON/brightness
+                        echo netdev > /sys/devices/virtual/leds/WIFI_2G_ON/trigger
+            	        echo $WLAN_IF  > /sys/devices/virtual/leds/WIFI_2G_ON/device_name
+            	        echo "link tx" > /sys/devices/virtual/leds/WIFI_2G_ON/mode
+            	        echo 125 > /sys/devices/virtual/leds/WIFI_2G_ON/interval
+		    fi
+		#fi
+        else
+                echo "interface=wlan0.0" > $WLANCONF_2
+				if [ "$NATENABLE" = "5" ]; then 
+					echo "bridge=br0" >> $WLANCONF_2
+				else
+					echo "bridge=br1" >> $WLANCONF_2
+                fi
+				echo "driver=mtlk" >> $WLANCONF_2
+                echo "ssid=${WLANSSID_2}" >> $WLANCONF_2
+                echo "macaddr_acl=0" >> $WLANCONF_2
+                echo "wpa_key_mgmt=WPA-PSK" >> $WLANCONF_2
+		# parse the WPA key length
+                WPALEN_2=${#WLANPSKASCII_2}
+                if [ "$WPALEN_2" = "64" ]; then
+                        echo "wpa_psk=${WLANPSKASCII_2}" >> $WLANCONF_2
+                else
+                        echo "wpa_passphrase=${WLANPSKASCII_2}" >> $WLANCONF_2
+                fi
+                echo "wpa_group_rekey=600" >> $WLANCONF_2
+                echo "wpa_gmk_rekey=86400" >> $WLANCONF_2
+		echo "ctrl_interface=/var/run/hostapd" >> $WLANCONF_2
+                if [ "$WLANSEC_2" == "OPEN" ]; then
+                        #run hostapd on open mode, for the WPS feature
+                        echo "wpa=0" >> $WLANCONF_2
+                        echo "wpa_pairwise=CCMP" >> $WLANCONF_2
+                elif [ "$WLANSEC_2" == "WPA" ]; then
+                        echo "wpa=1" >> $WLANCONF_2
+                        if [ "$WLANisN" = "1" ]; then
+                            echo "wpa_pairwise=CCMP" >> $WLANCONF_2
+                        else
+                            echo "wpa_pairwise=TKIP" >> $WLANCONF_2
+                        fi
+                elif [ "$WLANSEC_2" == "WPA2" ]; then
+                        echo "wpa=2" >> $WLANCONF_2
+                        echo "wpa_pairwise=CCMP" >> $WLANCONF_2
+                elif [ "$WLANSEC_2" == "WPAWPA2" ]; then
+                        echo "wpa=3" >> $WLANCONF_2
+                        echo "wpa_pairwise=TKIP CCMP" >> $WLANCONF_2
+                fi
+                echo -e "$WLANCONF_2 \c\h" >> /tmp/conf_filename
+        fi
+#fi
+
+# handle the WPS Setting
+WLANWPSEn_0=0
+WLANWPSEn_1=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select WPSEnabled from wifiAP where wlanName = 'ap1';"`
+WLANWPSEn_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select WPSEnabled from wifiAP where wlanName = 'ap2';"`
+if [ "$WLANWPSEn_1" = "1" -a "$WLANBCAST_1" = "1" ]; then
+	#if [ "$WLANEn_1" != "0" -a "$WLANSEC_1" != "WEP" ]; then
+	if [ "$WLANSEC_1" != "WEP" ]; then
+	    WPS_CONF=$WLANCONF_1
+	    echo "WPS_CONF=$WPS_CONF ....1"
+	    WLANWPSEn_0=1
+	fi
+elif [ "$WLANWPSEn_2" = "1" -a "$WLANBCAST_2" = "1" ]; then
+	#if [ "$WLANEn_2" != "0" -a "$WLANSEC_2" != "WEP" ]; then
+	if [ "$WLANSEC_2" != "WEP" ]; then
+	    WPS_CONF=$WLANCONF_2
+ 	    echo "WPS_CONF=$WPS_CONF ....2"
+	    WLANWPSEn_0=1
+	fi
+else
+	WLANWPSEn_0=0
+fi
+
+if [ "$WLANWPSEn_0" != "0" ]; then
+        echo "wps_state=2" >> $WPS_CONF	
+	echo "ieee8021x=0" >> $WPS_CONF
+	echo "eapol_key_index_workaround=0" >> $WPS_CONF
+	echo "eap_server=1" >> $WPS_CONF
+	echo "config_methods=push_button virtual_push_button physical_push_button" >> $WPS_CONF
+	echo "manufacturer=Atheros Communications, Inc." >> $WPS_CONF
+	echo "model_name=APxx" >> $WPS_CONF
+	echo "model_number=APxx-xxx" >> $WPS_CONF
+	echo "serial_number=Serial Number Here" >> $WPS_CONF
+	echo "manufacturer_url=http://manufacturer.url.here" >> $WPS_CONF
+	echo "friendly_name=WPS Access Point" >> $WPS_CONF
+	echo "model_description=Model description here" >> $WPS_CONF
+	echo "model_url=http://model.url.here" >> $WPS_CONF
+	#ap_pin=~~WSC_PIN:12345670~
+	echo "device_type=6-0050F204-1" >> $WPS_CONF
+	echo "device_name=AtherosAP" >> $WPS_CONF
+	echo "upnp_iface=br0" >> $WPS_CONF
+	echo "pbc_in_m1=1" >> $WPS_CONF
+	#add for WPS Enrollee
+	echo "wps_pin_requests=/var/run/hostapd/hostapd.pin-req" >> $WPS_CONF
+	echo 0 > /tmp/wps_state
+	sqlite3 -cmd ".timeout 1000" /tmp/system.db "update wifiStatus set WPSStatus='Enable' where profileName='wlan1'"
+fi
+
+#if [ -f /tmp/conf_filename ]; then
+# Run hostapd
+            #hostapd `cat /tmp/conf_filename` &
+            #hostapd `cat /tmp/conf_filename` -e /etc/wpa2/entropy &
+	    
+if [ "$WLANEn_1" != "0" -a "$WLANSEC_1" != "WEP" ]; then
+	hostapd $WLANCONF_1 &
+fi
+
+if [ "$WLANEn_2" != "0" ]; then
+	/usr/local/bin/dhcpd_br1Init start
+else
+	/usr/local/bin/dhcpd_br1Init stop
+fi 
+if [ "$WLANEn_2" != "0" -a "$WLANSEC_2" != "WEP" ]; then
+	hostapd $WLANCONF_2 &
+fi
+
+logger -t "[WIFI]" -p local1.info "SSID1 enable: $WLANEn_1, SSID2 enable: $WLANEn_2"
+logger -t "[WIFI]" -p local1.info "SSID1 security: $WLANSEC_1, SSID2 security: $WLANSEC_2"
+logger -t "[WIFI]" -p local1.info "Radio: 802.11$WLANNetMode, HT$WLANFortyMode channel $WLANCh"
+
+
+
+
+if [ "$WLANEn_1" != "0" -o "$WLANEn_2" != "0" ]; then
+	    # Turn on the WIFI 2.4G LED
+            echo 1 > /sys/devices/virtual/leds/WIFI_2G_ON/brightness
+	    echo netdev > /sys/devices/virtual/leds/WIFI_2G_ON/trigger
+	    echo $WLAN_IF  > /sys/devices/virtual/leds/WIFI_2G_ON/device_name
+	    echo "link tx" > /sys/devices/virtual/leds/WIFI_2G_ON/mode
+	    echo 125 > /sys/devices/virtual/leds/WIFI_2G_ON/interval
+fi
+#fi
+
+#run WIFI ACL setting
+/usr/local/bin/wifiACL.sh
+#run AOCS to Database 
+#/usr/local/bin/wifiAOCS.sh
+# Sync the data actively
+# reset the routing
+#/usr/local/bin/routing.sh
+rm /tmp/wifisetting_11n
+sync

@@ -1,0 +1,13 @@
+Package: iptables-utils
+Version: 1.4.6-2
+Depends: iptables
+Provides: 
+Source: package/feeds/open_applications/iptables
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 48757
+Description:  iptables save and restore utilities

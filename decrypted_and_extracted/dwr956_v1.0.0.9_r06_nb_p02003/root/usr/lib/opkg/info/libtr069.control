@@ -1,0 +1,13 @@
+Package: libtr069
+Version: 20130617-1
+Depends: libopenssl
+Provides: 
+Source: package/wnc-packages/libtr069
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 146006
+Description:  This package contains TR069 library

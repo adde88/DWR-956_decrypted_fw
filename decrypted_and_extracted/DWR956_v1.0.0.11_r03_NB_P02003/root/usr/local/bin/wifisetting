@@ -1,0 +1,25 @@
+#!/bin/sh
+
+echo "Database callback handler"
+
+WIFI_SETTING=`cat /tmp/wifisetting`
+if [ "$WIFI_SETTING" == "1" ]; then
+        echo "WIFI boot setting is running"
+        exit 0
+fi
+
+WIFItoSet=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select profilecommit from wifiProfilecommit where profileName='wificommit';"`
+
+#echo "WIFItoSet=$WIFItoSet"
+
+if [ "$WIFItoSet" == "ac" ]; then
+	echo "run 11ac setting"
+	[ -e /usr/local/bin/wifiACInit ]  && /usr/local/bin/wifiACInit
+elif [ "$WIFItoSet" == "both" ]; then
+	echo "run both 11n, 11ac setting"
+	[ -e /usr/local/bin/wifiACInit ]  && /usr/local/bin/wifiACInit
+	[ -e /usr/local/bin/wifiInit ]  && /usr/local/bin/wifiInit
+else
+	echo "run 11n setting"
+	[ -e /usr/local/bin/wifiInit ]  && /usr/local/bin/wifiInit
+fi

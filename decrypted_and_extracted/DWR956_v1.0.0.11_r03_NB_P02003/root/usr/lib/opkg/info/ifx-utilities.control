@@ -1,0 +1,13 @@
+Package: ifx-utilities
+Version: 2.3.0.73-1
+Depends: mtd-utils
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/ifx_utilities
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies AG
+Architecture: ltqcpe
+Installed-Size: 122086
+Description:  This package contains Lantiq package utilities for IFX modules.

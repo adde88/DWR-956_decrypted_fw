@@ -1,0 +1,3 @@
+/lib/modules/2.6.32.42/drv_tapi.ko
+/etc/init.d/ltq_load_voice_tapi.sh
+/opt/lantiq/bin/drv_tapi.ko

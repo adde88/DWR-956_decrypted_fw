@@ -1,0 +1,13 @@
+Package: matrixssl
+Version: 1.8.3-1
+Depends: libpthread
+Provides: 
+Source: package/feeds/open_applications/matrixssl
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 37152
+Description:  Embedded SSL implementation

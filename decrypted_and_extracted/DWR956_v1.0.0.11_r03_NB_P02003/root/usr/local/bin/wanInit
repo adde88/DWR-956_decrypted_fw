@@ -1,0 +1,27 @@
+#!/bin/sh
+
+echo "WAN init with lte_daemon..."
+
+if [ ! -e /mnt/data/lte_connection_settings ];then
+	if [ ! -e /mnt/data/lte_connection_settings_backup ];then
+		echo "lte_connection_settings & lte_connection_settings_backup are gone, back up from /usr/local/etc/lte_connection_settings "
+		cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+	else	
+		echo "lte_connection_settings is gone, back up from /mnt/data/lte_connection_settings_backup "
+		cp -f /mnt/data/lte_connection_settings_backup /mnt/data/lte_connection_settings
+	fi
+	sleep 1
+fi
+
+echo 1 > /sys/devices/virtual/leds/LTE_RST/brightness
+while [ -e "/dev/qcqmi0" ]; do
+  sleep 1
+done
+sleep 1
+echo 0 > /sys/devices/virtual/leds/LTE_RST/brightness
+
+#/etc/rc.d/S93lte_daemon.sh boot
+#sleep 5
+#/etc/rc.d/S94mal-sysmgr.sh start
+#lte_set -q 0 -c
+#sleep 5

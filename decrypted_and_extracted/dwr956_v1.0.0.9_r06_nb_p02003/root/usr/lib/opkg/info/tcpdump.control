@@ -1,0 +1,13 @@
+Package: tcpdump
+Version: 4.1.1-1
+Depends: libpcap
+Provides: 
+Source: package/feeds/open_debug_tools/tcpdump
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 266742
+Description:  Network monitoring and data acquisition tool

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel> 
+<item>
+<subject>Time Sheet approval</subject>
+<message>Request you to approve my time sheet for the month of may </message>
+<mailid>Ravi@lantiq.com</mailid>
+<pubDate>11:08:11:11:46:47</pubDate>
+<readstatus>1</readstatus>
+</item>
+<item>
+<subject>RE: Project appoved</subject>
+<message>The project has been approved as per the spec. </message>
+<mailid>Manager@lantiq.com</mailid>
+<pubDate>11:08:11:11:46:47</pubDate>
+<readstatus>1</readstatus>
+</item>
+</channel>
+</rss>

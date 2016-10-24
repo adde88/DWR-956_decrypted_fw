@@ -1,0 +1,6 @@
+/etc/banner
+/etc/init.d/ltq_show_version.sh
+/opt/lantiq/bin/inst_driver.sh
+/opt/lantiq/bin/whatz.sh
+/opt/lantiq/bin/what.sh
+/opt/lantiq/bin/debug_level.cfg

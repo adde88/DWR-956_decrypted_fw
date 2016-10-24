@@ -1,0 +1,13 @@
+Package: ppacmd
+Version: 2.3.7-2
+Depends: 
+Provides: 
+Source: package/feeds/ltq_driver_tools/ppacmd
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies AG
+Architecture: ltqcpe
+Installed-Size: 47415
+Description:  ppacmd

@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+[ -e /usr/local/bin/webServerInit ] && webServerInit
+
+/usr/sbin/telnetd &
+
+/etc/init.d/dropbear start
+

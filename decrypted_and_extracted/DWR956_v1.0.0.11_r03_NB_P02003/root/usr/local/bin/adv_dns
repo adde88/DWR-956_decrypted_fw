@@ -1,0 +1,117 @@
+#!/bin/sh
+if [ -e /tmp/dhcpc_usb0.result ]; then
+    USB0_PRIMARY_DNS=`grep 'dns ' /tmp/dhcpc_usb0.result | cut -d' ' -f2 | tail -1`
+    USB0_SECOND_DNS=`grep 'dns ' /tmp/dhcpc_usb0.result | cut -d' ' -f3 | tail -1`
+fi
+if [ -e /tmp/dhcpc_usb1.result ]; then
+    USB1_PRIMARY_DNS=`grep 'dns ' /tmp/dhcpc_usb1.result | cut -d' ' -f2 | tail -1`
+    USB1_SECOND_DNS=`grep 'dns ' /tmp/dhcpc_usb1.result | cut -d' ' -f3 | tail -1`
+fi
+if [ -e /tmp/dhcpc_usb2.result ]; then
+    USB2_PRIMARY_DNS=`grep 'dns ' /tmp/dhcpc_usb2.result | cut -d' ' -f2 | tail -1`
+    USB2_SECOND_DNS=`grep 'dns ' /tmp/dhcpc_usb2.result | cut -d' ' -f3 | tail -1`
+fi
+
+#clear
+[ -e /ramdisk/etc/resolv.conf ] && sed -i '/nameserver/d' /ramdisk/etc/resolv.conf
+echo "nameserver 127.0.0.1" >> /ramdisk/etc/resolv.conf
+
+#usb0 is first priority
+if [ -n "$USB0_PRIMARY_DNS" ] && [ "$USB0_PRIMARY_DNS" != "0.0.0.0" ]; then
+    echo "nameserver $USB0_PRIMARY_DNS" >> /ramdisk/etc/resolv.conf
+	if [ -e /tmp/dhcpc_usb1.result ]; then
+	    ip route delete $USB0_PRIMARY_DNS dev usb1
+	fi
+	if [ -e /tmp/dhcpc_usb2.result ]; then
+	    ip route delete $USB0_PRIMARY_DNS dev usb2
+	fi
+fi
+if [ -n "$USB0_SECOND_DNS" ] && [ "$USB0_SECOND_DNS" != "0.0.0.0" ]; then
+    echo "nameserver $USB0_SECOND_DNS" >> /ramdisk/etc/resolv.conf
+	if [ -e /tmp/dhcpc_usb1.result ]; then
+	    ip route delete $USB0_SECOND_DNS dev usb1
+	fi
+	if [ -e /tmp/dhcpc_usb2.result ]; then
+	    ip route delete $USB0_SECOND_DNS dev usb2
+	fi
+fi
+if [ -e /tmp/ipv6_usb0.result ]; then
+    USB0_IPV6_PRIMARY_DNS=`grep 'dns ' /tmp/ipv6_usb0.result | cut -d' ' -f2 | tail -1`
+    USB0_IPV6_SECOND_DNS=`grep 'dns ' /tmp/ipv6_usb0.result | cut -d' ' -f3 | tail -1`
+	
+	if [ -n "$USB0_IPV6_PRIMARY_DNS" ] && [ "$USB0_IPV6_PRIMARY_DNS" != "0000:0000:0000:0000:0000:0000:0000:0000" ]; then
+	    echo "nameserver $USB0_IPV6_PRIMARY_DNS" >> /ramdisk/etc/resolv.conf
+		if [ -e /tmp/ipv6_usb1.result ]; then
+		    ip -6 route delete $USB0_IPV6_PRIMARY_DNS dev usb1
+		fi
+		if [ -e /tmp/ipv6_usb2.result ]; then
+		    ip -6 route delete $USB0_IPV6_PRIMARY_DNS dev usb2
+		fi
+	fi
+	if [ -n "$USB0_IPV6_SECOND_DNS" ] && [ "$USB0_IPV6_SECOND_DNS" != "0000:0000:0000:0000:0000:0000:0000:0000" ]; then
+	    echo "nameserver $USB0_IPV6_SECOND_DNS" >> /ramdisk/etc/resolv.conf
+		if [ -e /tmp/ipv6_usb1.result ]; then
+		    ip -6 route delete $USB0_IPV6_SECOND_DNS dev usb1
+		fi
+		if [ -e /tmp/ipv6_usb2.result ]; then
+		    ip -6 route delete $USB0_IPV6_SECOND_DNS dev usb2
+		fi
+	fi
+fi
+#usb1 is second priority
+if [ -e /tmp/dhcpc_usb1.result ]; then
+	if [ -n "$USB1_PRIMARY_DNS" ] && [ "$USB1_PRIMARY_DNS" != "0.0.0.0" ] && [ "$USB1_PRIMARY_DNS" != "$USB0_PRIMARY_DNS" ] && [ "$USB1_PRIMARY_DNS" != "$USB0_SECOND_DNS" ] ; then
+	    ip route add $USB1_PRIMARY_DNS dev usb1
+		echo "nameserver $USB1_PRIMARY_DNS" >> /ramdisk/etc/resolv.conf
+	fi
+	if [ -n "$USB1_SECOND_DNS" ] && [ "$USB1_SECOND_DNS" != "0.0.0.0" ] && [ "$USB1_SECOND_DNS" != "$USB0_PRIMARY_DNS" ] && [ "$USB1_SECOND_DNS" != "$USB0_SECOND_DNS" ] ; then
+	    ip route add $USB1_SECOND_DNS dev usb1
+		echo "nameserver $USB1_SECOND_DNS" >> /ramdisk/etc/resolv.conf
+	fi
+fi
+if [ -e /tmp/ipv6_usb1.result ]; then
+    USB1_IPV6_PRIMARY_DNS=`grep 'dns ' /tmp/ipv6_usb1.result | cut -d' ' -f2 | tail -1`
+    USB1_IPV6_SECOND_DNS=`grep 'dns ' /tmp/ipv6_usb1.result | cut -d' ' -f3 | tail -1`
+	
+	if [ -n "$USB1_IPV6_PRIMARY_DNS" ] && [ "$USB1_IPV6_PRIMARY_DNS" != "0000:0000:0000:0000:0000:0000:0000:0000" ] && [ "$USB1_IPV6_PRIMARY_DNS" != "$USB0_IPV6_PRIMARY_DNS" ] && [ "$USB1_IPV6_PRIMARY_DNS" != "$USB0_IPV6_SECOND_DNS" ] ; then
+	    ip -6 route add $USB1_IPV6_PRIMARY_DNS dev usb1
+		echo "nameserver $USB1_IPV6_PRIMARY_DNS" >> /ramdisk/etc/resolv.conf
+	fi
+	if [ -n "$USB1_IPV6_SECOND_DNS" ] && [ "$USB1_IPV6_SECOND_DNS" != "0000:0000:0000:0000:0000:0000:0000:0000" ] && [ "$USB1_IPV6_SECOND_DNS" != "$USB0_IPV6_PRIMARY_DNS" ] && [ "$USB1_IPV6_SECOND_DNS" != "$USB0_IPV6_SECOND_DNS" ] ; then
+	    ip -6 route add $USB1_IPV6_SECOND_DNS dev usb1
+		echo "nameserver $USB1_IPV6_SECOND_DNS" >> /ramdisk/etc/resolv.conf
+	fi
+fi
+
+#usb2 is third priority
+if [ -e /tmp/dhcpc_usb2.result ]; then
+    if [ -n "$USB2_PRIMARY_DNS" ] && [ "$USB2_PRIMARY_DNS" != "0.0.0.0" ] && [ "$USB2_PRIMARY_DNS" != "$USB1_PRIMARY_DNS" ] && [ "$USB2_PRIMARY_DNS" != "$USB1_SECOND_DNS" ] ; then
+        if [ "$USB2_PRIMARY_DNS" != "$USB0_PRIMARY_DNS" ] && [ "$USB2_PRIMARY_DNS" != "$USB0_SECOND_DNS" ] ; then
+            ip route add $USB2_PRIMARY_DNS dev usb2
+            echo "nameserver $USB2_PRIMARY_DNS" >> /ramdisk/etc/resolv.conf
+        fi
+	fi
+	if [ -n "$USB2_SECOND_DNS" ] && [ "$USB2_SECOND_DNS" != "0.0.0.0" ] && [ "$USB2_SECOND_DNS" != "$USB1_PRIMARY_DNS" ] && [ "$USB2_SECOND_DNS" != "$USB1_SECOND_DNS" ] ; then
+        if [ "$USB2_PRIMARY_DNS" != "$USB0_PRIMARY_DNS" ] && [ "$USB2_PRIMARY_DNS" != "$USB0_SECOND_DNS" ] ; then
+		    ip route add $USB2_SECOND_DNS dev usb2
+		    echo "nameserver $USB2_SECOND_DNS" >> /ramdisk/etc/resolv.conf
+        fi
+    fi
+fi
+if [ -e /tmp/ipv6_usb2.result ]; then
+    USB2_IPV6_PRIMARY_DNS=`grep 'dns ' /tmp/ipv6_usb2.result | cut -d' ' -f2 | tail -1`
+    USB2_IPV6_SECOND_DNS=`grep 'dns ' /tmp/ipv6_usb2.result | cut -d' ' -f3 | tail -1`
+	
+    if [ -n "$USB2_IPV6_PRIMARY_DNS" ] && [ "$USB2_IPV6_PRIMARY_DNS" != "0000:0000:0000:0000:0000:0000:0000:0000" ] && [ "$USB2_IPV6_PRIMARY_DNS" != "$USB1_IPV6_PRIMARY_DNS" ] && [ "$USB2_IPV6_PRIMARY_DNS" != "$USB1_IPV6_SECOND_DNS" ] ; then
+        if [ "$USB2_IPV6_PRIMARY_DNS" != "$USB0_IPV6_PRIMARY_DNS" ] && [ "$USB2_IPV6_PRIMARY_DNS" != "$USB0_IPV6_SECOND_DNS" ] ; then
+            ip -6 route add $USB2_IPV6_PRIMARY_DNS dev usb2
+            echo "nameserver $USB2_IPV6_PRIMARY_DNS" >> /ramdisk/etc/resolv.conf
+        fi
+	fi
+	if [ -n "$USB2_IPV6_SECOND_DNS" ] && [ "$USB2_IPV6_SECOND_DNS" != "0000:0000:0000:0000:0000:0000:0000:0000" ] && [ "$USB2_IPV6_SECOND_DNS" != "$USB1_IPV6_PRIMARY_DNS" ] && [ "$USB2_IPV6_SECOND_DNS" != "$USB1_IPV6_SECOND_DNS" ] ; then
+        if [ "$USB2_IPV6_PRIMARY_DNS" != "$USB0_IPV6_PRIMARY_DNS" ] && [ "$USB2_IPV6_PRIMARY_DNS" != "$USB0_IPV6_SECOND_DNS" ] ; then
+		    ip -6 route add $USB2_IPV6_SECOND_DNS dev usb2
+		    echo "nameserver $USB2_IPV6_SECOND_DNS" >> /ramdisk/etc/resolv.conf
+        fi
+    fi
+fi

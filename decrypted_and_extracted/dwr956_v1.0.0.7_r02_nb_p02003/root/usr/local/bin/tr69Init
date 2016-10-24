@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+
+
+# Initial part	
+init(){
+    Enable=`grep "config.tr69Config\[1\]\[\"Enable\"\]" /sysconfig/jnr-cfg.ascii | awk -F"\"" '{print $4}' | cut -d/ -f3 | cut -d: -f1`
+	if [ "$Enable" = "0" ] ; then
+	    echo "TR69 is Disabled"
+	else
+	    echo -n "starting TR69 Daemon..."
+		dwatchctl add CMD="tr69d -d jnr,download,main,debug,cb -f /tmp/tr69client.log -e /usr/local/etc/tr69" KEYNAME=tr69d DELAY=5
+		dwatchctl start tr69d
+	    echo "Done"
+	fi
+}
+
+# reload part	
+reload(){
+	echo "reload tr69d"
+	dwatchctl stop tr69d
+	init
+	exit 0
+}
+
+
+test -f /usr/local/bin/tr69d || exit 0
+
+if ps ax | grep -v grep | grep tr69d > /dev/null 
+then
+	reload
+else
+	init
+fi

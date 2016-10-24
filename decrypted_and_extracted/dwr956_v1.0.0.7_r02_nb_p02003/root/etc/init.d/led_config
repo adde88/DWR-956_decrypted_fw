@@ -1,0 +1,8 @@
+#!/bin/sh /etc/rc.common
+
+START=68
+
+start() {
+	/usr/local/bin/led_config.sh &
+}
+

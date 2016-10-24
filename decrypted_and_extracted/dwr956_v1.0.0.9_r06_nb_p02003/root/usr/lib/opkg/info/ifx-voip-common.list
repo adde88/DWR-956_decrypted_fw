@@ -1,0 +1,2 @@
+/lib/modules/2.6.32.42/voip_timer_driver.ko
+/etc/init.d/ifx_load_voip_common_drivers.sh

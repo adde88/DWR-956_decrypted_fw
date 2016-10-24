@@ -1,0 +1,50 @@
+#!/bin/sh
+
+Port0Link=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=0 |grep eLink | awk '{print $2}'`
+Port0Speed=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=0 |grep eSpeed | awk '{print $2}'`
+if [ "$Port0Link" = 0 ];then
+Port0Link=1
+elif [ "$Port0Link" = 1 ];then
+Port0Link=0
+Port0Speed=10
+fi
+#echo $Port0Link
+
+Port1Link=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=2 |grep eLink | awk '{print $2}'`
+Port1Speed=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=2 |grep eSpeed | awk '{print $2}'`
+if [ "$Port1Link" = 0 ];then
+Port1Link=1
+elif [ "$Port1Link" = 1 ];then
+Port1Link=0
+Port1Speed=10
+fi
+#echo $Port1Link
+
+Port2Link=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=4 |grep eLink | awk '{print $2}'`
+Port2Speed=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=4 |grep eSpeed | awk '{print $2}'`
+if [ "$Port2Link" = 0 ];then
+Port2Link=1
+elif [ "$Port2Link" = 1 ];then
+Port2Link=0
+Port2Speed=10
+fi
+#echo $Port2Link
+
+Port3Link=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=1 |grep eLink | awk '{print $2}'`
+Port3Speed=`switch_cli IFX_ETHSW_PORT_LINK_CFG_GET nPortId=1 |grep eSpeed | awk '{print $2}'`
+if [ "$Port3Link" = 0 ];then
+Port3Link=1
+elif [ "$Port3Link" = 1 ];then
+Port3Link=0
+Port3Speed=10
+fi
+#echo $Port3Link
+
+echo "BEGIN;" > /tmp/lan.sql
+echo "update LANStatus set speed=$Port0Speed, linkstatus=$Port0Link where portNumber=0;" >> /tmp/lan.sql
+echo "update LANStatus set speed=$Port1Speed, linkstatus=$Port1Link where portNumber=1;" >> /tmp/lan.sql
+echo "update LANStatus set speed=$Port2Speed, linkstatus=$Port2Link where portNumber=2;" >> /tmp/lan.sql
+echo "update LANStatus set speed=$Port3Speed, linkstatus=$Port3Link where portNumber=3;" >> /tmp/lan.sql
+echo "COMMIT;" >> /tmp/lan.sql
+sqlite3 /tmp/system.db < /tmp/lan.sql
+#rm /tmp/lan.sql

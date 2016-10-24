@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#echo "add lease"
+# fill the clientIf
+iwlist wlan0 peers | grep -i $3
+if [ $? == 0 ]; then
+	CliIF=wlan0
+else 
+iwlist wlan0.0 peers | grep -i $3
+	if [ $? == 0 ]; then
+		CliIF=wlan0.0
+	else 
+		CliIF=eth0
+	fi
+fi
+/usr/local/bin/sqlite+ /tmp/system.db "insert into DhcpLeasedClients (LogicalIfname, hostName, IpAddr, MacAddr, Timeout, clientIf) values ('1', '"$1"', '"$2"', '"$3"', '"$4"','"$CliIF"')";

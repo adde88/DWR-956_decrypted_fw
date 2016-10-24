@@ -1,0 +1,13 @@
+Package: kmod-napt66
+Version: 2.6.32.42+0.2-r18
+Depends: kernel (=2.6.32.42-1-unknown), ip6tables, radvd
+Provides: 
+Source: package/napt66
+Section: kernel
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 9112
+Description:  Stateful IPv6-to-IPv6 Network Address Port Translation.

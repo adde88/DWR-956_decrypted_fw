@@ -1,0 +1,49 @@
+#!/bin/sh
+
+if [ "_$ip" = "_" ]
+then
+return
+fi
+
+if [ "_$router" = "_" ]
+then
+return
+fi
+
+/sbin/ifconfig $interface $ip netmask $subnet up
+route add default gw $router dev $interface 
+
+ip_change=1
+if [ -e /tmp/dhcpc_usb0.result ]; then
+	OLD_IP=`grep 'ip ' /tmp/dhcpc_usb0.result | cut -d' ' -f2 | tail -1`
+	if [ "_$ip" = "_$OLD_IP" ]; then
+		ip_change=0
+		echo "USB0 IP not change !!!"
+	else	
+		echo "USB0 IP change !!!"
+	fi
+else
+	echo "USB0 IP change !!!"	
+fi
+
+echo "udhcpc write ip: $ip and dns: $dns to /tmp/dhcpc_usb0.result"
+echo "ip $ip" > /tmp/dhcpc_usb0.result
+echo "dns $dns" >> /tmp/dhcpc_usb0.result
+echo "netmask $subnet" >> /tmp/dhcpc_usb0.result
+echo "gateway $router" >> /tmp/dhcpc_usb0.result
+
+adv_dns usb0
+
+if [ "$ip_change" = "1" ]; then
+	adv_route start usb0
+	#Notify VoIP
+	#/usr/local/bin/voip_ip_chg.sh usb0 &
+	#Start a watchdog to check IP
+	#/usr/local/bin/voip_ip_chk.sh usb0 &
+fi
+
+NOWYEAR=`date +%Y`
+if [ "${NOWYEAR}" = "1970" ]; then
+	#sleep 5
+	[ -e /usr/local/bin/ntp.sh ] && ntp.sh
+fi

@@ -1,0 +1,452 @@
+#define sql queries here
+
+#Conditions
+LTEIPStatusCond1=select * from lteIPStatus where _ROWID_='1'
+LTEIPStatusCond2=select * from lteIPStatus where _ROWID_='2'
+LTEIPStatusCond3=select * from lteIPStatus where _ROWID_='3'
+
+#map all objects here. Make sure hirerarchy of objects is maintained
+
+#map all parameters here
+
+#
+#	LANDevice.{i}.LANHostConfigManagement
+#
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.MACAddress:::br0:3::
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DHCPServerEnable:DhcpServerBasic:Enable::1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.MinAddress:DhcpServerBasic:StartIpAddress::1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.MaxAddress:DhcpServerBasic:EndIpAddress::1:1:
+#InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.ReservedAddresses:DhcpfixedIpAddress:IpAddr::1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.SubnetMask:Lan:SubnetMask::1:1:
+#InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DNSServers:DhcpServerPools:DNSServer1::1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DomainName:system:domain::1:1:
+#InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.IPRouters:DhcpServerPools:IPRouters::1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DHCPLeaseTime:DhcpServerBasic:LeaseTime::1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.AllowedMACAddresses:wifiACLTable1:ACL_MAC::81:81:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DHCPStaticAddressNumberOfEntries:DhcpfixedIpAddress:::93::
+#
+#	LANDevice.{i}.LANHostConfigManagement.IPInterface.{i}.
+#
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.IPInterface.1.IPInterfaceIPAddress:networkInterface:ipaddr:LogicalIfName='LAN1':1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.IPInterface.1.IPInterfaceSubnetMask:networkInterface:subnetmask:LogicalIfName='LAN1':1:1:
+InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.IPInterface.1.IPInterfaceAddressingType:networkInterface:ConnectionType:LogicalIfName='LAN1':1:1:
+#
+#	LANDevice.{i}.LANEthernetInterfaceConfig.{i}
+#
+InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.MACAddress:Lan:MacAddress::1::
+#
+#	LANDevice.{i}.LANEthernetInterfaceConfig.{i}.Stats
+#
+InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Stats.BytesSent:::eth0:82::
+InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Stats.BytesReceived:::eth0:83::
+InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Stats.PacketsSent:::eth0:84::
+InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Stats.PacketsReceived:::eth0:85::
+
+#
+#	LANDevice.{i}.Hosts.Host{i}
+#
+InternetGatewayDevice.LANDevice.1.Hosts.HostNumberOfEntries:DhcpLeasedClients:::87::
+InternetGatewayDevice.LANDevice.1.Hosts.Host.:DhcpLeasedClients:::87::
+
+#
+#	Layer3Forwarding
+#
+
+#
+#	LANDevice.{i}.Hosts
+#
+
+#
+#	Time.
+#
+InternetGatewayDevice.Time.Enable:ntpConfig:enabled::1:1:
+InternetGatewayDevice.Time.NTPServer1:ntpConfig:server1::1:1:
+InternetGatewayDevice.Time.NTPServer2:ntpConfig:server2::1:1:
+InternetGatewayDevice.Time.LocalTimeZone:ntpConfig:timezone::91:91:
+InternetGatewayDevice.Time.LocalTimeZoneName:ntpConfig:timezone::90:90:
+InternetGatewayDevice.Time.CurrentLocalTime::::92::
+
+#
+#   IPPingDiagnostics.
+#
+InternetGatewayDevice.IPPingDiagnostics.DiagnosticsState:::::82:
+InternetGatewayDevice.IPPingDiagnostics.Interface:::::82:
+InternetGatewayDevice.IPPingDiagnostics.Host:::::82:
+InternetGatewayDevice.IPPingDiagnostics.NumberOfRepetitions:::::82:
+InternetGatewayDevice.IPPingDiagnostics.Timeout:::::82:
+InternetGatewayDevice.IPPingDiagnostics.DataBlockSize:::::82:
+InternetGatewayDevice.IPPingDiagnostics.DSCP:::::82:
+
+#
+#   TraceRouteDiagnostics.
+#
+InternetGatewayDevice.TraceRouteDiagnostics.DiagnosticsState:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.Interface:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.Host:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.NumberOfTries:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.Timeout:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.DataBlockSize:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.DSCP:::::83:
+InternetGatewayDevice.TraceRouteDiagnostics.MaxHopCount:::::83:
+#
+#   DownloadDiagnostics
+#
+InternetGatewayDevice.DownloadDiagnostics.DiagnosticsState:::::84:
+InternetGatewayDevice.DownloadDiagnostics.Interface:::::84:
+InternetGatewayDevice.DownloadDiagnostics.DownloadURL:::::84:
+InternetGatewayDevice.DownloadDiagnostics.DSCP:::::84:
+InternetGatewayDevice.DownloadDiagnostics.EthernetPriority:::::84:
+#
+#   UploadDiagnostics
+#
+InternetGatewayDevice.UploadDiagnostics.DiagnosticsState:::::85:
+InternetGatewayDevice.UploadDiagnostics.Interface:::::85:
+InternetGatewayDevice.UploadDiagnostics.UploadURL:::::85:
+InternetGatewayDevice.UploadDiagnostics.DSCP:::::85:
+InternetGatewayDevice.UploadDiagnostics.EthernetPriority:::::85:
+InternetGatewayDevice.UploadDiagnostics.TestFileLength:::::85:
+#
+#   UDPEchoConfig
+#
+InternetGatewayDevice.UDPEchoConfig.Enable:::::86:
+
+#
+# WANDevice
+#
+
+#
+# Static/DHCP WAN
+#
+
+#
+# Static/DHCP WAN Port Mappings
+#
+
+# Static/DHCP WAN Statistics
+
+# LANconfigSecurity
+InternetGatewayDevice.LANConfigSecurity.ConfigPassword:users:password:groupname='admin':9:30:
+# 
+#	WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.
+#
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress:lteIPStatus:ip::1:1:LTEIPStatusCond1
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ConnectionType:FirewallNatConfig:Enable::88:88:
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMappingNumberOfEntries:PortForwarding:::89::
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.MACAddress:::usb0:3::
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.1.PortMappingEnabled:FirewallDmz:Enable:::89:
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.1.InternalClient:FirewallDmz:DmzIpAddress:::89:
+#
+#	VendorConfigFile
+#
+
+#
+#	InternetGateway.DeviceInfo object
+#
+InternetGatewayDevice.ManagementServer.URL:tr69Config:URL::1:1:
+InternetGatewayDevice.ManagementServer.ConnectionRequestURL::::2::
+InternetGatewayDevice.ManagementServer.ConnectionRequestUsername:tr69Config:ConnectionRequestUsername::1:1:
+InternetGatewayDevice.ManagementServer.ConnectionRequestPassword:tr69Config:ConnectionRequestPassword::1:1:
+InternetGatewayDevice.ManagementServer.Username:tr69Config:Username::1:1:
+InternetGatewayDevice.ManagementServer.Password:tr69Config:Password::1:1:
+InternetGatewayDevice.ManagementServer.STUNEnable:tr69Config:STUNEnable::1:2:
+InternetGatewayDevice.ManagementServer.STUNServerAddress:tr69Config:STUNServerAddress::1:1:
+InternetGatewayDevice.ManagementServer.STUNUsername:tr69Config:STUNUsername::1:1:
+InternetGatewayDevice.ManagementServer.STUNPassword:tr69Config:STUNPassword::1:1:
+InternetGatewayDevice.ManagementServer.PeriodicInformEnable:tr69Config:PeriodicInformEnable::1:3:
+InternetGatewayDevice.ManagementServer.PeriodicInformInterval:tr69Config:PeriodicInformInterval::1:4:
+InternetGatewayDevice.ManagementServer.X_UpgradeOnlyLTE:tr69Config:UpgradeOnlyLTE::1:1:
+
+InternetGatewayDevice.DeviceInfo.ManufacturerOUI::::94::
+InternetGatewayDevice.DeviceInfo.ProvisioningCode:tr69Config:ProvisioningCode::1:1:
+InternetGatewayDevice.DeviceInfo.SerialNumber:system:serNum::1::
+InternetGatewayDevice.DeviceInfo.SoftwareVersion:system:firmwareVer::1::
+InternetGatewayDevice.DeviceInfo.ModemFirmwareVersion::::30::
+InternetGatewayDevice.DeviceInfo.X_ModuleIMEI:lteHwInfo:IMEI::1::
+InternetGatewayDevice.DeviceInfo.X_IMSI::::40::
+InternetGatewayDevice.DeviceInfo.X_LTEVersion::::30::
+#InternetGatewayDevice.DeviceInfo.HardwareVersion:system:hardwareVer::1::
+InternetGatewayDevice.DeviceInfo.UpTime::::8::
+InternetGatewayDevice.DeviceInfo.FirstUseDate:tr69Config:FirstUseDate::1:5:
+
+InternetGatewayDevice.DeviceInfo.MemoryStatus.Total::::5::
+InternetGatewayDevice.DeviceInfo.MemoryStatus.Free::::6::
+InternetGatewayDevice.DeviceInfo.ProccessStatus.CPUUsage::::7::
+#
+#   LANDevice.{i}.WLANConfiguration.{i}
+#
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Enable:wifiAP:wlanEnabled:wlanName = 'ap1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Status:wifiAP:wlanEnabled:wlanName = 'ap1':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.BSSID:::wlan0:3::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Channel:wifiRadio:configuredChannel:radioNo = '1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID:wifiProfile:ssid:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSIDAdvertisementEnabled:wifiProfile:broadcastSSID:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Standard:wifiRadio:opMode:radioNo = '1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WEPKeyIndex:wifiProfile:defWepkeyIdx:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.KeyPassphrase:wifiProfile:wepkeyPassphrase:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TransmitPower:wifiRadio:txPower:radioNo = '1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.BeaconType:wifiProfile:security:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WEPEncryptionLevel:wifiProfile:security:profileName = 'wlan1':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.BasicEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.BasicAuthenticationMode:wifiProfile:wepAuth:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WPAEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WPAAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.IEEE11iEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.IEEE11iAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.MACAddressControlEnabled:wifiACLconfig:ACLPolicy1:_ROWID_='1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalBytesSent:::wlan0:82::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalBytesReceived:::wlan0:83::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalPacketsSent:::wlan0:84::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalPacketsReceived:::wlan0:85::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalAssociations:DhcpLeasedClients::clientIf='wlan0':86::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.Enable:wifiAP:wlanEnabled:wlanName = 'ap2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.Status:wifiAP:wlanEnabled:wlanName = 'ap2':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.BSSID:::wlan0.0:3::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.Channel:wifiRadio:configuredChannel:radioNo = '1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.SSID:wifiProfile:ssid:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.SSIDAdvertisementEnabled:wifiProfile:broadcastSSID:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.Standard:wifiRadio:opMode:radioNo = '1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WEPKeyIndex:wifiProfile:defWepkeyIdx:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.KeyPassphrase:wifiProfile:wepkeyPassphrase:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TransmitPower:wifiRadio:txPower:radioNo = '1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.BeaconType:wifiProfile:security:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WEPEncryptionLevel:wifiProfile:security:profileName = 'wlan2':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.BasicEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.BasicAuthenticationMode:wifiProfile:wepAuth:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WPAEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WPAAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.IEEE11iEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.IEEE11iAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.MACAddressControlEnabled:wifiACLconfig:ACLPolicy2:_ROWID_='1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalBytesSent:::wlan0.0:82::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalBytesReceived:::wlan0.0:83::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalPacketsSent:::wlan0.0:84::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalPacketsReceived:::wlan0.0:85::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalAssociations:DhcpLeasedClients::clientIf='wlan0.0':86::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.Enable:wifiAP:wlanEnabled:wlanName = 'ap3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.Status:wifiAP:wlanEnabled:wlanName = 'ap3':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.BSSID:::ath0:3::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.Channel:wifiRadio:configuredChannel:radioNo = '2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.SSID:wifiProfile:ssid:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.SSIDAdvertisementEnabled:wifiProfile:broadcastSSID:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.Standard:wifiRadio:opMode:radioNo = '2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WEPKeyIndex:wifiProfile:defWepkeyIdx:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.KeyPassphrase:wifiProfile:wepkeyPassphrase:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TransmitPower:wifiRadio:txPower:radioNo = '2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.BeaconType:wifiProfile:security:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WEPEncryptionLevel:wifiProfile:security:profileName = 'wlan3':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.BasicEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.BasicAuthenticationMode:wifiProfile:wepAuth:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WPAEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WPAAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.IEEE11iEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.IEEE11iAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.MACAddressControlEnabled:wifiACLconfig:ACLPolicy3:_ROWID_='1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalBytesSent:::ath0:82::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalBytesReceived:::ath0:83::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalPacketsSent:::ath0:84::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalPacketsReceived:::ath0:85::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalAssociations:DhcpLeasedClients::clientIf='ath0':86::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.PossibleChannels::::81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.Enable:wifiAP:wlanEnabled:wlanName = 'ap4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.Status:wifiAP:wlanEnabled:wlanName = 'ap4':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.BSSID:::ath1:3::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.Channel:wifiRadio:configuredChannel:radioNo = '2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.SSID:wifiProfile:ssid:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.SSIDAdvertisementEnabled:wifiProfile:broadcastSSID:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.Standard:wifiRadio:opMode:radioNo = '2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WEPKeyIndex:wifiProfile:defWepkeyIdx:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.KeyPassphrase:wifiProfile:wepkeyPassphrase:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TransmitPower:wifiRadio:txPower:radioNo = '2':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.BeaconType:wifiProfile:security:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WEPEncryptionLevel:wifiProfile:security:profileName = 'wlan4':81::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.BasicEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.BasicAuthenticationMode:wifiProfile:wepAuth:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WPAEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WPAAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.IEEE11iEncryptionModes:wifiProfile:pairwiseCiphers:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.IEEE11iAuthenticationMode:wifiProfile:authMethods:profileName = 'wlan4':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.MACAddressControlEnabled:wifiACLconfig:ACLPolicy4:_ROWID_='1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalBytesSent:::ath1:82::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalBytesReceived:::ath1:83::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalPacketsSent:::ath1:84::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalPacketsReceived:::ath1:85::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalAssociations:DhcpLeasedClients::clientIf='ath1':86::
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.PossibleChannels::::81::
+#
+#   LANDevice.{i}.WLANConfiguration.{i}.WPS.
+#
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WPS.Enable:wifiAP:WPSEnabled:wlanName = 'ap1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WPS.DevicePassword:wifiWPS:WPSEnrollPIN:profileName='wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WPS.ConfigMethodsEnabled:wifiWPS:WPSmethod:profileName='wlan1':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WPS.Enable:wifiAP:WPSEnabled:wlanName = 'ap3':81:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WPS.DevicePassword:wifiWPS:WPSEnrollPIN:profileName='wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WPS.ConfigMethodsEnabled:wifiWPS:WPSmethod:profileName='wlan3':81:81:
+
+#
+#	LANDevice.{i}.WLANConfiguration.{i}.AssociatedDevice.{i}.
+#
+#InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.AssociatedDevice.:DhcpLeasedClients::clientIf='wlan0':86::
+#InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.AssociatedDevice.:DhcpLeasedClients::clientIf='wlan0.0':86::
+#InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.AssociatedDevice.:DhcpLeasedClients::clientIf='ath0':86::
+#InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.AssociatedDevice.:DhcpLeasedClients::clientIf='ath1':86::
+
+#
+#	LANDevice.{i}.WLANConfiguration.{i}.WEPKey.{i}
+#
+#	This table has a fixed number of four entries. 
+#
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WEPKey.1.WEPKey:wifiProfile:wepkey0:profileName = 'wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WEPKey.2.WEPKey:wifiProfile:wepkey1:profileName = 'wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WEPKey.3.WEPKey:wifiProfile:wepkey2:profileName = 'wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.WEPKey.4.WEPKey:wifiProfile:wepkey3:profileName = 'wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WEPKey.1.WEPKey:wifiProfile:wepkey0:profileName = 'wlan2':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WEPKey.2.WEPKey:wifiProfile:wepkey1:profileName = 'wlan2':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WEPKey.3.WEPKey:wifiProfile:wepkey2:profileName = 'wlan2':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.WEPKey.4.WEPKey:wifiProfile:wepkey3:profileName = 'wlan2':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WEPKey.1.WEPKey:wifiProfile:wepkey0:profileName = 'wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WEPKey.2.WEPKey:wifiProfile:wepkey1:profileName = 'wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WEPKey.3.WEPKey:wifiProfile:wepkey2:profileName = 'wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.WEPKey.4.WEPKey:wifiProfile:wepkey3:profileName = 'wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WEPKey.1.WEPKey:wifiProfile:wepkey0:profileName = 'wlan4':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WEPKey.2.WEPKey:wifiProfile:wepkey1:profileName = 'wlan4':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WEPKey.3.WEPKey:wifiProfile:wepkey2:profileName = 'wlan4':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.WEPKey.4.WEPKey:wifiProfile:wepkey3:profileName = 'wlan4':9:81:
+
+#
+#	LANDevice.{i}.WLANConfiguration.{i}.PreSharedKey.{i}
+#
+#	This table is fixed to 10 entries
+#
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.PreSharedKey.1.PreSharedKey:wifiProfile:pskPassHex:profileName = 'wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.PreSharedKey.1.KeyPassphrase:wifiProfile:pskPassAscii:profileName = 'wlan1':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.PreSharedKey.1.PreSharedKey:wifiProfile:pskPassHex:profileName = 'wlan2':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.PreSharedKey.1.KeyPassphrase:wifiProfile:pskPassAscii:profileName = 'wlan2':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.PreSharedKey.1.PreSharedKey:wifiProfile:pskPassHex:profileName = 'wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.PreSharedKey.1.KeyPassphrase:wifiProfile:pskPassAscii:profileName = 'wlan3':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.PreSharedKey.1.PreSharedKey:wifiProfile:pskPassHex:profileName = 'wlan4':9:81:
+InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.PreSharedKey.1.KeyPassphrase:wifiProfile:pskPassAscii:profileName = 'wlan4':9:81:
+
+#
+#	LANDevice.{i}.WLANConfiguration.{i}.Stats.
+#
+
+#
+#	LANDevice.{i}.WLANConfiguration.{i}.APWMMParameter.{i}.
+#
+
+#
+#	LteDevice.
+#	LteDevice.1.Status.		< lteNwStatus
+#	LteDevice.1.Profile.		< lteNwProfileDetailData
+#
+#
+InternetGatewayDevice.X_LteDevice.1.Status.RadioSignalStrength::::31::
+InternetGatewayDevice.X_LteDevice.1.Status.RadioMode::::32:42:
+InternetGatewayDevice.X_LteDevice.1.Status.RadioFrenquency::::38:43:
+InternetGatewayDevice.X_LteDevice.1.Status.RSSI::::33::
+InternetGatewayDevice.X_LteDevice.1.Status.RegistrationStatus::::34::
+InternetGatewayDevice.X_LteDevice.1.Status.RadioInterference::::35::
+InternetGatewayDevice.X_LteDevice.1.Status.NetworkName::::36::
+InternetGatewayDevice.X_LteDevice.1.Status.CellID::::37::
+InternetGatewayDevice.X_LteDevice.1.Status.APNStatus:lteRadio:apn_status::1:6:
+InternetGatewayDevice.X_LteDevice.1.Status.Network::::55::
+InternetGatewayDevice.X_LteDevice.1.Status.RoamingStatus::::56::
+InternetGatewayDevice.X_LteDevice.1.Interface.ConnectionStatus:::0:45::
+InternetGatewayDevice.X_LteDevice.1.Interface.ExternalIPAddress:lteIPStatus:ip::1::LTEIPStatusCond1
+InternetGatewayDevice.X_LteDevice.1.Interface.SubnetMask:::0:46::
+InternetGatewayDevice.X_LteDevice.1.Interface.DefaultGateway:::0:47::
+InternetGatewayDevice.X_LteDevice.1.Interface.DNSServer1:::0:48::
+InternetGatewayDevice.X_LteDevice.1.Interface.DNSServer2:::0:49::
+InternetGatewayDevice.X_LteDevice.1.Interface.MACAddress:::usb0:3::
+InternetGatewayDevice.X_LteDevice.1.Interface.Profile.APN:::1:41:41:
+InternetGatewayDevice.X_LteDevice.1.Interface.Profile.Username:::1:42::
+InternetGatewayDevice.X_LteDevice.1.Interface.Profile.Password:::1:43::
+InternetGatewayDevice.X_LteDevice.1.Interface.Profile.AuthMethod:::1:44::
+InternetGatewayDevice.X_LteDevice.1.Interface.Stats.BytesSent:::0:50::
+InternetGatewayDevice.X_LteDevice.1.Interface.Stats.BytesReceived:::0:51::
+InternetGatewayDevice.X_LteDevice.1.Interface.Stats.PacketsSent:::0:52::
+InternetGatewayDevice.X_LteDevice.1.Interface.Stats.PacketsReceived:::0:53::
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Enable:VoiceProfile:State:_ROWID_='1':11:11:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.DigitMap:::_ROWID_='1':14:14:
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.SIP.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.ProxyServer:VoiceProfileSignaling:ProxyAddr:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.RegistrarServer:VoiceProfileSignaling:RegistrarAddr:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.RegistrarServerPort:VoiceProfileSignaling:RegistrarPort:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.UserAgentDomain:VoiceProfileSignaling:UADomain:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.OutboundProxy:VoiceProfileSignaling:OutboundProxyAddr:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.OutboundProxyPort:VoiceProfileSignaling:OutboundProxyPort:_ROWID_='1':1:9:
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.NumberingPlan.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.NumberingPlan.InterDigitTimerStd:::_ROWID_='1':15:15:
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Enable:VoiceLine:State:_ROWID_='1':11:11:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Status:VoiceLine:LineStatus:_ROWID_='1':10::
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.DirectoryNumber:VoiceLineSignaling:SipUserName:_ROWID_='1':1:10:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Enable:VoiceLine:State:_ROWID_='2':11:11:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Status:VoiceLine:LineStatus:_ROWID_='2':10::
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.DirectoryNumber:VoiceLineSignaling:SipUserName:_ROWID_='2':4:10:
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.Line.1.CallingFeatures.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.CallingFeatures.CallerIDName:VoiceLineSignaling:SipDispName:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.CallingFeatures.CallerIDEnable:::_ROWID_='1':12:12:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.CallingFeatures.CallWaitingEnable:::_ROWID_='1':13:13:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.CallingFeatures.CallerIDName:VoiceLineSignaling:SipDispName:_ROWID_='2':4:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.CallingFeatures.CallerIDEnable:::_ROWID_='2':12:12:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.CallingFeatures.CallWaitingEnable:::_ROWID_='2':13:13:
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.Line.1.SIP.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.SIP.AuthUserName:AuthCfg:SipAuthUsrName:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.SIP.AuthPassword:AuthCfg:SipAuthPasswd:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.SIP.URI:VoiceLineSignaling:SipDispName:_ROWID_='1':1:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.SIP.AuthUserName:AuthCfg:SipAuthUsrName:_ROWID_='2':4:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.SIP.AuthPassword:AuthCfg:SipAuthPasswd:_ROWID_='2':4:9:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.SIP.URI:VoiceLineSignaling:SipDispName:_ROWID_='2':4:9:
+#
+#	Services.VoiceService.{i}.VoiceProfile.{i}.Line.1.Codec.List.
+#
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.1.PacketizationPeriod:::0:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.1.SilenceSuppression:::0:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.2.PacketizationPeriod:::1:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.2.SilenceSuppression:::1:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.3.PacketizationPeriod:::2:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.3.SilenceSuppression:::2:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.4.PacketizationPeriod:::3:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.4.SilenceSuppression:::3:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.5.PacketizationPeriod:::4:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.5.SilenceSuppression:::4:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.6.PacketizationPeriod:::5:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.6.SilenceSuppression:::5:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.7.PacketizationPeriod:::6:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.7.SilenceSuppression:::6:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.8.PacketizationPeriod:::7:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.8.SilenceSuppression:::7:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.9.PacketizationPeriod:::8:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Codec.List.9.SilenceSuppression:::8:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.1.PacketizationPeriod:::10:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.1.SilenceSuppression:::10:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.2.PacketizationPeriod:::11:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.2.SilenceSuppression:::11:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.3.PacketizationPeriod:::12:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.3.SilenceSuppression:::12:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.4.PacketizationPeriod:::13:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.4.SilenceSuppression:::13:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.5.PacketizationPeriod:::14:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.5.SilenceSuppression:::14:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.6.PacketizationPeriod:::15:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.6.SilenceSuppression:::15:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.7.PacketizationPeriod:::16:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.7.SilenceSuppression:::16:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.8.PacketizationPeriod:::17:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.8.SilenceSuppression:::17:17:17:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.9.PacketizationPeriod:::18:16:16:
+InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.2.Line.1.Codec.List.9.SilenceSuppression:::18:17:17:

@@ -1,0 +1,20 @@
+#!/bin/sh /etc/rc.common
+
+START=70
+
+start() {
+	PATH=/usr/local/bin:/usr/local/sbin:$PATH
+
+	# step 4: application initial
+	[ -e /usr/local/bin/routing.sh ]             && routing.sh
+	[ -e /usr/local/bin/syslog.sh ]				 && syslog.sh
+	[ -e /usr/local/bin/systemInit ]             && systemInit
+	[ -e /usr/local/bin/lanServicesInit ]        && lanServicesInit
+	[ -e /usr/local/bin/wanServicesInit ]        && wanServicesInit
+	[ -e /usr/local/bin/save_some_sysinfo.sh ]   && save_some_sysinfo.sh
+	[ -e /usr/local/bin/upnp_service.sh ]		 && upnp_service.sh
+	[ -e /usr/local/bin/dlnaInit.sh ]                && dlnaInit.sh
+	/etc/init.d/cronInit start
+	/etc/init.d/mountd start
+	/etc/init.d/samba start
+}

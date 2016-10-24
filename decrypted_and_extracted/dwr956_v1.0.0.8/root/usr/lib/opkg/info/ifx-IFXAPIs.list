@@ -1,0 +1,5 @@
+/lib/libIFXAPIs.so
+/etc/init.d/ifx_load_ifxos_drv.sh
+/lib/libifx_osa.so
+/lib/modules/2.6.32.42/ifx_timer_driver.ko
+/lib/libifx_common.so

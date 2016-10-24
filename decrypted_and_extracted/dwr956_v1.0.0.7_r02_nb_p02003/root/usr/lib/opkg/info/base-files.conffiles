@@ -1,0 +1,13 @@
+/etc/banner
+/etc/inittab
+/etc/group
+/etc/profile
+/etc/shells
+/etc/sysctl.conf
+/etc/rc.local
+/etc/sysupgrade.conf
+/etc/config/network
+/etc/config/system
+/etc/crontabs/root
+/etc/config/network
+/etc/config/system

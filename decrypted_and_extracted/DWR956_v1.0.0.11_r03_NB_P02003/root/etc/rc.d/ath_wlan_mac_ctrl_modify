@@ -1,0 +1,85 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+   if [ -r /etc/rc.conf ]; then
+       . /etc/rc.conf 2> /dev/null
+      ENVLOADED="1"
+   fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+   if [ -r /etc/rc.d/config.sh ]; then
+      . /etc/rc.d/config.sh 2>/dev/null
+      CONFIGLOADED="1"
+   fi
+fi
+
+ATH_IF=""
+WLAN_VENDOR_NAME=""
+
+find_vendor_from_index() {
+  eval radioCpeId='$'wlmn_$1'_radioCpeId'
+  if [ "$radioCpeId" = "1" ]; then
+     radioPrefix=0
+  elif [ "$radioCpeId" = "2" ]; then
+     radioPrefix=1
+  fi
+  eval WLAN_VENDOR_NAME='$'wlss_$radioPrefix'_prefixScript'
+  #echo "WLAN_VENDOR_NAME: $WLAN_VENDOR_NAME"
+}
+
+
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+    eval pcpeId='$'wlsec_${1}_cpeId
+    eval MACACL='$'wlsec_${1}_macAddrCntrlType
+    eval MACCOUNT='$'wlan_mac_control_Count
+    
+    i=0
+    if [ "$MACACL" = "2" ]; then #none
+        iwpriv ${APNAME} maccmd 4
+    elif [ "$MACACL" = "0" ]; then #allow
+        iwpriv ${APNAME} maccmd 3
+        while [ $i -lt $MACCOUNT ]
+        do		
+          find_vendor_from_index $i
+          if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+        	   eval temp_pcpeId='$'wlmacctrl_${i}_pcpeId
+        	   eval temp_mac='$'wlmacctrl_${i}_macAddr
+        	   if [ "$temp_pcpeId" = "$pcpeId" ]; then
+                    iwpriv ${APNAME} addmac $temp_mac
+        	   fi
+        	fi
+        	i=`expr $i + 1`
+        done
+        
+        iwpriv ${APNAME} maccmd 1
+    elif [ "$MACACL" = "1" ]; then #deny
+        iwpriv ${APNAME} maccmd 3
+        while [ $i -lt $MACCOUNT ]
+        do		
+          find_vendor_from_index $i
+          if [ "$WLAN_VENDOR_NAME" = "ath" ]; then
+        	   eval temp_pcpeId='$'wlmacctrl_${i}_pcpeId
+        	   eval temp_mac='$'wlmacctrl_${i}_macAddr
+        	   if [ "$temp_pcpeId" = "$pcpeId" ]; then
+                    iwpriv ${APNAME} addmac $temp_mac
+        	   fi
+        	fi
+        	i=`expr $i + 1`
+        done
+        
+        iwpriv ${APNAME} maccmd 2
+    fi
+fi

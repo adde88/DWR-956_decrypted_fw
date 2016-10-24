@@ -1,0 +1,13 @@
+/usr/local/bin/6rd_udhcpc.sh
+/usr/local/bin/ipv6_dual.sh
+/usr/local/bin/ipv6_service.sh
+/usr/local/bin/ipv6_reset.sh
+/usr/local/bin/gogoc.sh
+/usr/local/bin/ipv6_wan.sh
+/usr/local/bin/dhcpv6.sh
+/usr/local/bin/6to4.sh
+/usr/local/bin/openwrt.sh
+/usr/local/bin/6rd.sh
+/usr/local/bin/radvd.sh
+/usr/local/bin/ipv6_lan.sh
+/usr/local/bin/6in4.sh

@@ -1,0 +1,13 @@
+Package: ltq-wlan-wave
+Version: 03.04.01.20-1
+Depends: kmod-ltqcpe-wlan-wave-support, ltq-wlan-wave-rflib
+Provides: 
+Source: package/feeds/ltq_feeds_wave/lq-wave-300
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Technologies
+Architecture: ltqcpe
+Installed-Size: 2478685
+Description:  This package contains wave300/wave400 scripts/binaries

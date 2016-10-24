@@ -1,0 +1,5 @@
+/etc/init.d/mountd
+/etc/init.d/usb_automount_status.sh
+/etc/config/mountd
+/sbin/mountd
+/etc/init.d/usb_led.sh

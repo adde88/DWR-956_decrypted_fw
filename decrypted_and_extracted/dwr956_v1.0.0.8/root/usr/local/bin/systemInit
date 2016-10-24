@@ -1,0 +1,125 @@
+#!/bin/sh
+#
+
+# reload part	
+reload(){
+	echo "event handler already exist."
+	cp /usr/local/bin/ap_fw_upgrade.sh /tmp/ap_fw_upgrade.sh
+	exit 0
+}
+
+# Initial part	
+init(){
+	echo -n "starting JNRP event handler Daemon..."
+	evtDsptchd /tmp/system.db &
+	cp /usr/local/bin/ap_fw_upgrade.sh /tmp/ap_fw_upgrade.sh
+	echo "Done"
+}
+
+# switch antenna
+sw_ant(){
+	echo "#! /bin/sh" > /mnt/data/ant_sw_int
+	echo "echo 0 > /mnt/data/ant_status" >> /mnt/data/ant_sw_int
+	echo "echo 0 > /sys/devices/virtual/leds/ANT_SW/brightness" >> /mnt/data/ant_sw_int
+	echo "echo 0 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness" >> /mnt/data/ant_sw_int
+	echo "echo 0 > /proc/ant_sw/ant_sw_state" >> /mnt/data/ant_sw_int
+	echo "sync" >> /mnt/data/ant_sw_int
+	chmod +x /mnt/data/ant_sw_int
+
+	echo "#! /bin/sh" > /mnt/data/ant_sw_ext
+	echo "echo 255 > /mnt/data/ant_status" >> /mnt/data/ant_sw_ext
+	echo "echo 255 > /sys/devices/virtual/leds/ANT_SW/brightness" >> /mnt/data/ant_sw_ext
+	echo "echo 255 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness" >> /mnt/data/ant_sw_ext
+	echo "echo 1 > /proc/ant_sw/ant_sw_state" >> /mnt/data/ant_sw_ext
+	echo "sync" >> /mnt/data/ant_sw_ext
+	chmod +x /mnt/data/ant_sw_ext
+
+	ant_status=255
+	[ -e /mnt/data/ant_status ] && ant_status=`cat /mnt/data/ant_status` || echo 255 > /mnt/data/ant_status
+	if [ $ant_status = 0 ];then
+		echo 0 > /sys/devices/virtual/leds/ANT_SW/brightness
+		echo 0 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness
+		echo 0 > /proc/ant_sw/ant_sw_state
+	else
+		echo 255 > /sys/devices/virtual/leds/ANT_SW/brightness
+		echo 255 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness
+		echo 1 > /proc/ant_sw/ant_sw_state
+	fi
+}
+
+# hardware configuration
+hw_config(){
+	# change MDC to 2.5MHz
+	switch_utility RegisterSet 0xC4C 0x109
+
+# woody 2013-03-04 : add for EMI issue
+echo "--------------- EMI CMD START ---------------"
+        mem -s 0x1f2030c8 -w 0x8000000f -u
+
+echo "--------------- Disable Auto-polling ---------------"
+        switch_utility RegisterSet 0xc4b 0x3e
+
+echo "--------------- Disable port 0 GPHY CLKOUT ---------------"
+        echo "write dev=0x0, reg=0xd, data=0x1f"
+        switch_utility MDIO_DataWrite 0x0 0xd 0x1f
+
+        echo "write dev=0x0, reg=0xe, data=0xea9"
+        switch_utility MDIO_DataWrite 0x0 0xe 0xea9
+
+        echo "write dev=0x0, reg=0xd, data=0x401f"
+        switch_utility MDIO_DataWrite 0x0 0xd 0x401f
+
+        echo "write dev=0x0, reg=0xe, data=0x15"
+        switch_utility MDIO_DataWrite 0x0 0xe 0x15
+
+echo "--------------- RGMII slew rate control enable ---------------"
+        echo "write dev=0x0, reg=0xd, data=0x1f"
+        switch_utility MDIO_DataWrite 0x0 0xd 0x1f
+
+        echo "write dev=0x0, reg=0xe, data=0xea8"
+        switch_utility MDIO_DataWrite 0x0 0xe 0xea8
+
+        echo "write dev=0x0, reg=0xd, data=0x401f"
+        switch_utility MDIO_DataWrite 0x0 0xd 0x401f
+
+        echo "write dev=0x0, reg=0xe, data=0x85"
+        switch_utility MDIO_DataWrite 0x0 0xe 0x85
+
+echo "--------------- Enable Auto-polling ---------------"
+        switch_utility RegisterSet 0xc4b 0x3f
+
+echo "--------------- Restart auto-negotiation ---------------"
+        switch_utility MDIO_DataWrite 0x0 0x0 0x1240
+
+echo "--------------- EMI CMD END ---------------"
+
+# woody 2013-03-04 : Change ethernet port output voltage from 960mV to 1010mV
+echo "--------------- Change Ethernet Port output voltage START ---------------"
+        echo "write dev=0x0, reg=0x13, data=0x501"
+        switch_utility MDIO_DataWrite 0x0 0x13 0x501
+
+        echo "write dev=0x2, reg=0x13, data=0x501"
+        switch_utility MDIO_DataWrite 0x2 0x13 0x501
+
+        echo "write dev=0x4, reg=0x13, data=0x501"
+        switch_utility MDIO_DataWrite 0x4 0x13 0x501
+
+        echo "write dev=0x1, reg=0x13, data=0x501"
+        switch_utility MDIO_DataWrite 0x1 0x13 0x501
+echo "--------------- Change Ethernet Port output voltage END ---------------"
+}
+
+hw_config
+
+# move sw_ant to wanStart
+# sw_ant
+
+test -f /lib/modules/2.6.32.42/umi.ko || exit 0
+test -f /usr/local/bin/evtDsptchd || exit 0
+
+if ps ax | grep -v grep | grep evtDsptchd > /dev/null 
+then
+	reload
+else
+	init
+fi

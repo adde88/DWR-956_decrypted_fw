@@ -1,0 +1,102 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+   if [ -r /etc/rc.conf ]; then
+       . /etc/rc.conf 2> /dev/null
+      ENVLOADED="1"
+   fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+   if [ -r /etc/rc.d/config.sh ]; then
+      . /etc/rc.d/config.sh 2>/dev/null
+      CONFIGLOADED="1"
+   fi
+fi
+
+WLMN_INDEX=$1
+ATH_IF=""
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+
+
+echo "ath_wlan_wmm_modify $@"
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+    eval pcpeId='$'wlmn_${WLMN_INDEX}_cpeId
+    eval WMMENA='$'wlmn_${WLMN_INDEX}_wmmEna
+    eval UAPSDENA='$'wlmn_${WLMN_INDEX}_uapsdEna
+    
+    echo "WMM Modify script"
+    if [ "$WMMENA" = "1" ]; then
+        i=0
+        while [ $i -lt 4 ]
+        do
+            eval ap_ECWmin='$'wlawmm${pcpeId}_${i}_ECWmin
+            if [ "$ap_ECWmin" != "" ]; then
+                iwpriv ${APNAME} cwmin ${i} 0 $ap_ECWmin
+            fi
+            eval ap_ECWmax='$'wlawmm${pcpeId}_${i}_ECWmax
+            if [ "$ap_ECWmax" != "" ]; then
+                iwpriv ${APNAME} cwmax ${i} 0 $ap_ECWmax
+            fi
+            eval ap_AIFSN='$'wlawmm${pcpeId}_${i}_AIFSN
+            if [ "$ap_AIFSN" != "" ]; then
+                iwpriv ${APNAME} aifs ${i} 0 $ap_AIFSN
+            fi
+            eval ap_TXOP='$'wlawmm${pcpeId}_${i}_TXOP
+            if [ "$ap_TXOP" != "" ]; then
+                iwpriv ${APNAME} txoplimit ${i} 0 $ap_TXOP
+            fi
+            eval ap_AckPolicy='$'wlawmm${pcpeId}_${i}_AckPolicy
+            if [ "$ap_AckPolicy" != "" ]; then
+                iwpriv ${APNAME} noackpolicy ${i} 0 $ap_AckPolicy
+            fi
+            eval ap_AdmCntrl='$'wlawmm${pcpeId}_${i}_AdmCntrl
+            if [ "$ap_AdmCntrl" != "" ]; then
+                iwpriv ${APNAME} acm ${i} 1 $ap_AdmCntrl
+            fi
+            eval bss_ECWmin='$'wlswmm${pcpeId}_${i}_ECWmin
+            if [ "$bss_ECWmin" != "" ]; then
+                iwpriv ${APNAME} cwmin ${i} 1 $bss_ECWmin
+            fi
+            eval bss_ECWmax='$'wlswmm${pcpeId}_${i}_ECWmax
+            if [ "$bss_ECWmax" != "" ]; then
+                iwpriv ${APNAME} cwmax ${i} 1 $bss_ECWmax
+            fi
+            eval bss_AIFSN='$'wlswmm${pcpeId}_${i}_AIFSN
+            if [ "$bss_AIFSN" != "" ]; then
+                iwpriv ${APNAME} aifs ${i} 1 $bss_AIFSN
+            fi
+            eval bss_TXOP='$'wlswmm${pcpeId}_${i}_TXOP
+            if [ "$bss_TXOP" != "" ]; then
+                iwpriv ${APNAME} txoplimit ${i} 1 $bss_TXOP
+            fi
+            eval bss_AckPolicy='$'wlswmm${pcpeId}_${i}_AckPolicy
+            if [ "$bss_AckPolicy" != "" ]; then
+                iwpriv ${APNAME} noackpolicy ${i} 1 $bss_AckPolicy
+            fi
+            
+            i=`expr $i + 1`
+        done
+        
+        iwpriv ${APNAME} wmm 1
+    else
+        iwpriv ${APNAME} wmm 0
+    fi
+
+    if [ "$UAPSDENA" = "1" ]; then
+        iwpriv ${APNAME} uapsd 1
+    else
+        iwpriv ${APNAME} uapsd 0
+    fi
+            
+fi

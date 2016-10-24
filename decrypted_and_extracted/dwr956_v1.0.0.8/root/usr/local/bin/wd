@@ -1,0 +1,16 @@
+#!/bin/sh
+# ES monitor services which important
+
+LOOP_TIME=5
+
+while :
+do
+	# checker
+	if [ -z `pidof webs` ]; then
+		echo "[1] Restore services..."
+		/usr/local/bin/webs -db /tmp/system.db &
+		logger -p daemon.3 -t app_watchdog -s resotre webs ... 
+	fi	
+	
+	sleep $LOOP_TIME
+done

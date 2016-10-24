@@ -1,0 +1,13 @@
+Package: libnetfilter_conntrack
+Version: 1.0.2-1
+Depends: 
+Provides: 
+Source: package/feeds/packages/net/libnetfilter_conntrack
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 30253
+Description:  API to the in-kernel connection tracking state table

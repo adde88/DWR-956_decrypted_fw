@@ -1,0 +1,13 @@
+Package: libjnrpsql
+Version: 20130617-1
+Depends: libsqlite3e
+Provides: 
+Source: package/wnc-packages/libjnrpsql
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 2584
+Description:  This package contains UMI library

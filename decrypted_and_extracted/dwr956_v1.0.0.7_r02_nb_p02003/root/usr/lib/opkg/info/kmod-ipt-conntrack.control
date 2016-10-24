@@ -1,0 +1,19 @@
+Package: kmod-ipt-conntrack
+Version: 2.6.32.42-1
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ipt-core
+Provides: 
+Source: package/kernel
+Section: kernel
+Status: unknown hold not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 1584
+Description:  Netfilter (IPv4) kernel modules for connection tracking
+ Includes:
+ - conntrack
+ - defrag (2.6)
+ - iptables_raw
+ - NOTRACK
+ - state

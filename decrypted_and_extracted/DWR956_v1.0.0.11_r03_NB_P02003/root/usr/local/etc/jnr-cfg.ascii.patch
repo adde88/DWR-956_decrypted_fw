@@ -1,0 +1,3 @@
+-- write items that need to be patched in this section
+--config.Lan[1]["IpAddress"] = "192.168.0.1"
+--config.DhcpServerBasic[1]["StartIpAddress"] = "192.168.0.2"

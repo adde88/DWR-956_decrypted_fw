@@ -1,0 +1,8 @@
+/lib/modules/2.6.32.42/ah6.ko
+/lib/modules/2.6.32.42/ipcomp6.ko
+/lib/modules/2.6.32.42/xfrm6_mode_transport.ko
+/lib/modules/2.6.32.42/esp6.ko
+/etc/modules.d/32-ipsec6
+/lib/modules/2.6.32.42/xfrm6_tunnel.ko
+/lib/modules/2.6.32.42/xfrm6_mode_tunnel.ko
+/lib/modules/2.6.32.42/xfrm6_mode_beet.ko

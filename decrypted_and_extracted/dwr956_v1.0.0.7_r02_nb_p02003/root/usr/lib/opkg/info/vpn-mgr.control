@@ -1,0 +1,13 @@
+Package: vpn-mgr
+Version: 20130701-1
+Depends: 
+Provides: 
+Source: package/wnc-packages/vpn
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 7730
+Description:  wnc vpn manager

@@ -1,0 +1,73 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+   if [ -r /etc/rc.conf ]; then
+       . /etc/rc.conf 2> /dev/null
+      ENVLOADED="1"
+   fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+   if [ -r /etc/rc.d/config.sh ]; then
+      . /etc/rc.d/config.sh 2>/dev/null
+      CONFIGLOADED="1"
+   fi
+fi
+
+ATH_IF=""
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then # [
+    find_ath_if_from_index $1
+    /usr/sbin/status_oper -d SET "ATH_MAP" "$CPEID" "$ATH_IF"
+    eval APNAME=ath${ATH_IF}
+    
+    ##
+    ## Get the name of the bridge. WE ARE ASSUMING ONLY ONE FOR NOW
+    ##
+    
+    BRNAME=`brctl show | grep -v bridge | cut -b 1-4`
+
+    # Remove from Bridge
+    
+    brctl delif $BRNAME $APNAME
+    sleep 2
+    
+    #
+    # Bring the interface down
+    #
+    
+    ifconfig $APNAME down
+    sleep 1
+    echo "killing $APNAME"
+    wlanconfig $APNAME destroy
+    
+    if [ "${1}" = "0" ]; then
+        #
+        # Do the same for all instances of hostapd, wpa_supplicant, and wsc
+        #
+
+        HOSTAPDLIST=`ps | grep hostapd_ath | cut -b 1-5`
+        if [ "${HOSTAPDLIST}" != "" ]; then
+            for i in $HOSTAPDLIST ; do
+                echo "killing $i"
+                kill -9 $i
+            done
+        fi
+
+        SUPPLIST=`ps | grep wpa_supplicant | cut -b 1-5`
+        if [ "${SUPPLIST}" != "" ]; then
+            for i in $SUPPLIST ; do
+                echo "killing $i"
+                 kill -9 $i
+             done
+        fi
+		sleep 4
+    fi    
+fi # ]

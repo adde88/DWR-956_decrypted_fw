@@ -1,0 +1,14 @@
+Package: busybox
+Version: 1.17.1-1
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/busybox
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Nicolas Thill <nico@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 269789
+Description:  The Swiss Army Knife of embedded Linux.
+ It slices, it dices, it makes Julian Fries.

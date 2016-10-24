@@ -1,0 +1,13 @@
+Package: arp
+Version: 1.0-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_netcomp_cpe/arp
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: LANTIQ Technologies AG
+Architecture: ltqcpe
+Installed-Size: 3545
+Description:  ARP This package contains arp utility support

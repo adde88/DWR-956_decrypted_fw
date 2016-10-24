@@ -1,0 +1,5 @@
+/usr/sbin/bringup_tapidemo
+/opt/ifx/bin/tapidemo
+/usr/sbin/tapidemo
+/lib/firmware/ter1x66_bbd.bin
+/opt/lantiq/bin/tapidemo

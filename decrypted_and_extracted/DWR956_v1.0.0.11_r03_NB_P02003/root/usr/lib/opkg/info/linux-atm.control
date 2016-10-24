@@ -1,0 +1,13 @@
+Package: linux-atm
+Version: 2.5.0-1
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/linux-atm
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 11998
+Description:  This package contains a library for accessing the Linux ATM subsystem.

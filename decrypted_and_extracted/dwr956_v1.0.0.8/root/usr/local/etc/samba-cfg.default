@@ -1,0 +1,8 @@
+user_obj_Count=1
+user_0_username=admin
+user_0_password=admin
+smb_ena=0
+smb_name=DWR953-Samba
+smb_descr=DWR953
+smb_workgroup=DWR953
+file_share_Count=0

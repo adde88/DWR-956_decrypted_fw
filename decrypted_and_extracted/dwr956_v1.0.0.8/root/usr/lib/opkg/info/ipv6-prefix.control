@@ -1,0 +1,13 @@
+Package: ipv6-prefix
+Version: 20130624-1
+Depends: 
+Provides: 
+Source: package/wnc-packages/ipv6
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 2903
+Description:  ipv6 prefix generator

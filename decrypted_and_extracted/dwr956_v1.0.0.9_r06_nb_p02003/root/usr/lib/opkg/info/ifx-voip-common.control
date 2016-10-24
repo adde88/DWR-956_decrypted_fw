@@ -1,0 +1,13 @@
+Package: ifx-voip-common
+Version: 2.5.0.2-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_voip/ifx_voip_common
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq
+Architecture: ltqcpe
+Installed-Size: 3303
+Description:  This ifx-voip-common package is Lantiq common package for Dect & VoIP Subsystem on UGW 4.2 onwards

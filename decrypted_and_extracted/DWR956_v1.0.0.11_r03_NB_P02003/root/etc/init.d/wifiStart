@@ -1,0 +1,18 @@
+#!/bin/sh /etc/rc.common
+
+START=89
+
+start() {
+# In bridge mode, do not init wifi
+	NATENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from FirewallNatConfig;"`
+	if [ "$NATENABLE" = "5" ]; then 
+		return
+	fi	
+
+	[ -e /usr/local/bin/wifiInit ]        		&& wifiInit
+
+
+	switch_cli IFX_FLOW_REGISTER_SET nRegAddr=0x4a nData=0x518
+	#echo 0 > /proc/sys/net/bridge/bridge-nf-call-iptables
+	#echo 0 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
+}

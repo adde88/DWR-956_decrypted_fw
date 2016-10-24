@@ -1,0 +1,1 @@
+../init.d/load_gphy_firmware.sh

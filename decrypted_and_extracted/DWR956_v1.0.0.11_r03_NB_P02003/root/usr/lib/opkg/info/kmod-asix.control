@@ -1,0 +1,13 @@
+Package: kmod-asix
+Version: 2.6.32.42+20100816-1
+Depends: kernel (=2.6.32.42-1-unknown)
+Provides: 
+Source: package/wnc-packages/AX88772B
+Section: kernel
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 26410
+Description:  This package contains asix driver

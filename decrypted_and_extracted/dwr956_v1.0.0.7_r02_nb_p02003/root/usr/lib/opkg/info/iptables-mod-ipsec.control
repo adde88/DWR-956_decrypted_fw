@@ -1,0 +1,17 @@
+Package: iptables-mod-ipsec
+Version: 1.4.6-2
+Depends: iptables, kmod-ipt-ipsec
+Provides: 
+Source: package/feeds/open_applications/iptables
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 3024
+Description:  iptables extensions for matching ipsec traffic.
+ Includes:
+ - libipt_ah
+ - libipt_esp
+ - libipt_policy

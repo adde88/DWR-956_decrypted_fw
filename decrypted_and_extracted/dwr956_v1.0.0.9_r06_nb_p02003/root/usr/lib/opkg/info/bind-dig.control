@@ -1,0 +1,13 @@
+Package: bind-dig
+Version: 9.7.2-P3-1
+Depends: bind-libs, libopenssl
+Provides: 
+Source: package/feeds/packages/net/bind
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 34083
+Description:  bind DNS excavation tool

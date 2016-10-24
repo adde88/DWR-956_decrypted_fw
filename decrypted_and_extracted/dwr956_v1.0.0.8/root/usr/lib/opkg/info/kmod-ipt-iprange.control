@@ -1,0 +1,15 @@
+Package: kmod-ipt-iprange
+Version: 2.6.32.42-1
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ipt-core
+Provides: 
+Source: package/kernel
+Section: kernel
+Status: unknown hold not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 1484
+Description:  Netfilter (IPv4) module for matching ip ranges
+ Includes:
+ - iprange

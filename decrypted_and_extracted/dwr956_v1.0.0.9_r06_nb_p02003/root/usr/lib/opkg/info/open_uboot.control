@@ -1,0 +1,13 @@
+Package: open_uboot
+Version: 2010.06-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_feeds_uboot/open_uboot
+Section: boot
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 103
+Description:  U-Boot for Infineon UEIP project

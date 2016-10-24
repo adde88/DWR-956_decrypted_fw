@@ -1,0 +1,13 @@
+Package: ppp-mod-pppoe
+Version: 2.4.4-5
+Depends: ppp
+Provides: 
+Source: package/feeds/open_applications/ppp
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 9429
+Description:  This package contains a PPPoE (PPP over Ethernet) plugin for ppp.

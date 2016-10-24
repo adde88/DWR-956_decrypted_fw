@@ -1,0 +1,7 @@
+#!/bin/sh
+
+DelIP=$1
+#echo "Delete IP=$DelIP"
+/usr/local/bin/sqlite+ /tmp/system.db "delete from DhcpLeasedClients WHERE IpAddr='$DelIP'"
+
+/usr/local/bin/sqlite+ /tmp/system.db "VACUUM"

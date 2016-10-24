@@ -1,0 +1,13 @@
+Package: ipsec-tools
+Version: 0.7.3-3
+Depends: libopenssl
+Provides: 
+Source: package/feeds/open_applications/ipsec-tools
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 45935
+Description:  IPsec management tools

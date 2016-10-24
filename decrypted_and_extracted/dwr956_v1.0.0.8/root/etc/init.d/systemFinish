@@ -1,0 +1,11 @@
+#!/bin/sh /etc/rc.common
+
+START=999
+
+start() {
+	# create BootOK file to indicate boot OK
+	echo 1 > /tmp/BootOK 
+
+	# Add back door for debug usage
+	./mnt/data/dbg_script.sh &
+}

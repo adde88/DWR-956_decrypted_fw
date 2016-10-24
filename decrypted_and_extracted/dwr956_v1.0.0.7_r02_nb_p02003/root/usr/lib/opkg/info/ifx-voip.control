@@ -1,0 +1,13 @@
+Package: ifx-voip
+Version: 2.6.0.19-1
+Depends: ifx-voice-cpe-tapi, ifx-voice-cpe-vmmc, ifx-IFXAPIs, ifx-oam, ifx-voice-cpe-tapi-kpi2udp, ifx-voip-common, ifx-dect, ifx-voice-cpe-libt38, libjnrpsql
+Provides: 
+Source: package/feeds/ltq_feeds_dect/ifx_voip
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq
+Architecture: ltqcpe
+Installed-Size: 705790
+Description:  This ifx-voip package is VoIP & DECT subsytem used to realize DECT & VoIP functionality on GW 4.2 onwards.

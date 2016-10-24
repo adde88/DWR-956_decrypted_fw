@@ -1,0 +1,8 @@
+/usr/sbin/DECT_VERSION
+/usr/drivers/drv_dect.ko
+/opt/ifx/downloads/BMCFw.BIN
+/usr/drivers/paging.ko
+/opt/ifx/downloads/COSICFw.BIN
+/usr/drivers/drv_timer.ko
+/etc/init.d/ifx_load_dect_drivers.sh
+/usr/sbin/DectCli

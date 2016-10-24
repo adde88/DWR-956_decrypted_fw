@@ -1,0 +1,15 @@
+Package: luasql-sqlite3
+Version: 2.1.1-1
+Depends: lua, libsqlite3
+Provides: 
+Source: package/feeds/packages/lang/luasql
+Section: lang
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 7091
+Description:  LuaSQL is a simple interface from Lua to a DBMS.
+ .
+ This package contains the SQLite 3 binding.

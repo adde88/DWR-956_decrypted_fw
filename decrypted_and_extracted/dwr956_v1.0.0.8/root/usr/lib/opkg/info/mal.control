@@ -1,0 +1,13 @@
+Package: mal
+Version: 1-1
+Depends: qmi-framework
+Provides: 
+Source: package/wnc-packages/mal
+Section: base
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 484161
+Description:  mal Library

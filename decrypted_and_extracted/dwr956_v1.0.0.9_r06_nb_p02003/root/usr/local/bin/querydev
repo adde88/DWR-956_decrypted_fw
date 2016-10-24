@@ -1,0 +1,498 @@
+#! /bin/sh
+
+NATENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from FirewallNatConfig;"`
+
+if [ "$NATENABLE" = "5" ]; then 
+	return
+fi
+
+queryWIFI1(){
+	iwlist wlan0 peers | grep -v wlan0 | tr A-Y a-y | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		fi
+		
+		from="WIFI1"
+		
+		# match wifi table
+		arp -n -i br0 | grep "$line"
+		if [ $? == 0 ];then
+			ip=`arp -n -i br0 | grep "$line" | sed 's/^.*(//g' | sed 's/) .*$//g'`
+			mac=`arp -n -i br0 | grep "$line" | sed 's/^.*at //g' | sed 's/ \[.*$//g'`	
+
+			dumpleases -f /var/lib/misc/udhcpd.leases | grep "$ip" | grep "$mac"
+			if [ $? == 0 ];then
+				ipstatus="DHCP"
+				devname=`dumpleases -f /var/lib/misc/udhcpd.leases | grep $ip | awk '{print "" $3}'`
+						
+				# for empty hostname
+				echo $devname | grep ":"
+				if [ $? == 0 ];then
+					devname="(null)"
+				else
+					# for empty hostname && expired
+					echo $devname | grep "expired"
+					if [ $? == 0 ];then
+						devname="(null)"
+					fi
+				fi
+			else
+				ipstatus="STATIC"
+				devname="(null)"
+			fi				
+		else
+			echo $line | grep wlan0
+			if [ $? == 0 ];then
+				continue		
+			fi
+			
+			ip="(null)"
+			mac=$line
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+					
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/wificonnectdev
+	done	
+}
+
+queryWIFI2(){
+	iwlist wlan0.0 peers | grep -v wlan0.0 | tr A-Y a-y | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		fi
+		
+		from="WIFI2"
+		
+		# match wifi table
+		arp -n -i br1 | grep "$line"
+		if [ $? == 0 ];then
+			ip=`arp -n -i br1 | grep "$line" | sed 's/^.*(//g' | sed 's/) .*$//g'`
+			mac=`arp -n -i br1 | grep "$line" | sed 's/^.*at //g' | sed 's/ \[.*$//g'`	
+
+			dumpleases -f /var/lib/misc/udhcpd_br1.leases | grep "$ip" | grep "$mac"
+			if [ $? == 0 ];then
+				ipstatus="DHCP"
+				devname=`dumpleases -f /var/lib/misc/udhcpd_br1.leases | grep $ip | awk '{print "" $3}'`
+						
+				# for empty hostname
+				echo $devname | grep ":"
+				if [ $? == 0 ];then
+					devname="(null)"
+				else
+					# for empty hostname && expired
+					echo $devname | grep "expired"
+					if [ $? == 0 ];then
+						devname="(null)"
+					fi
+				fi
+			else
+				ipstatus="STATIC"
+				devname="(null)"
+			fi		
+		else
+			echo $line | grep wlan0.0
+			if [ $? == 0 ];then
+				continue		
+			fi
+				
+			ip="(null)"
+			mac=$line
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+					
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/wificonnectdev
+	done
+}
+
+queryWIFI3(){
+	wlanconfig ath0 list station | grep ":" | tr A-Y a-y | awk '{print "" $1}' | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		fi
+		
+		from="WIFI3"
+		
+		# match wifi table
+		arp -n -i br0 | grep "$line"
+		if [ $? == 0 ];then
+			ip=`arp -n -i br0 | grep "$line" | sed 's/^.*(//g' | sed 's/) .*$//g'`
+			mac=`arp -n -i br0 | grep "$line" | sed 's/^.*at //g' | sed 's/ \[.*$//g'`	
+
+			dumpleases -f /var/lib/misc/udhcpd.leases | grep "$ip" | grep "$mac"
+			if [ $? == 0 ];then
+				ipstatus="DHCP"
+				devname=`dumpleases -f /var/lib/misc/udhcpd.leases | grep $ip | awk '{print "" $3}'`
+						
+				# for empty hostname
+				echo $devname | grep ":"
+				if [ $? == 0 ];then
+					devname="(null)"
+				else
+					# for empty hostname && expired
+					echo $devname | grep "expired"
+					if [ $? == 0 ];then
+						devname="(null)"
+					fi
+				fi
+			else
+				ipstatus="STATIC"
+				devname="(null)"
+			fi					
+		else
+			ip="(null)"
+			mac=$line
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+					
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/wificonnectdev
+	done
+}
+
+queryWIFI4(){
+	wlanconfig ath1 list station | grep ":" | tr A-Y a-y | awk '{print "" $1}' | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		fi
+		
+		from="WIFI4"
+		
+		# match wifi table
+		arp -n -i br1 | grep "$line"
+		if [ $? == 0 ];then
+			ip=`arp -n -i br1 | grep "$line" | sed 's/^.*(//g' | sed 's/) .*$//g'`
+			mac=`arp -n -i br1 | grep "$line" | sed 's/^.*at //g' | sed 's/ \[.*$//g'`	
+
+			dumpleases -f /var/lib/misc/udhcpd_br1.leases | grep "$ip" | grep "$mac"
+			if [ $? == 0 ];then
+				ipstatus="DHCP"
+				devname=`dumpleases -f /var/lib/misc/udhcpd_br1.leases | grep $ip | awk '{print "" $3}'`
+						
+				# for empty hostname
+				echo $devname | grep ":"
+				if [ $? == 0 ];then
+					devname="(null)"
+				else
+					# for empty hostname && expired
+					echo $devname | grep "expired"
+					if [ $? == 0 ];then
+						devname="(null)"
+					fi
+				fi
+			else
+				ipstatus="STATIC"
+				devname="(null)"
+			fi			
+		else
+			ip="(null)"
+			mac=$line
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+					
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/wificonnectdev
+	done
+}
+
+countWIFI(){
+	iwlist wlan0 peers | grep -v wlan0 | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		else
+			echo $line >> /tmp/countwifidev
+		fi
+	done	
+
+	iwlist wlan0.0 peers | grep -v wlan0.0 | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		else
+			echo $line >> /tmp/countwifidev	
+		fi
+	done
+
+	wlanconfig ath0 list station | grep ":" | awk '{print "" $1}' | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		else
+			echo $line >> /tmp/countwifidev				
+		fi
+	done
+
+	wlanconfig ath1 list station | grep ":" | awk '{print "" $1}' | while read line
+	do
+		echo $line | grep ":"
+		if [ $? != 0 ];then
+			continue
+		else
+			echo $line >> /tmp/countwifidev				
+		fi
+	done
+}
+
+if [ "_$1" != "_" ];then
+	if [ "_$1" = "_WIFI1" ];then
+		rm /tmp/wificonnectdev
+		touch /tmp/wificonnectdev
+		queryWIFI1
+	elif [ "_$1" = "_WIFI2" ]; then
+		rm /tmp/wificonnectdev
+		touch /tmp/wificonnectdev
+		queryWIFI2
+	elif [ "_$1" = "_WIFI3" ]; then
+		rm /tmp/wificonnectdev
+		touch /tmp/wificonnectdev	
+		queryWIFI3
+	elif [ "_$1" = "_WIFI4" ]; then
+		rm /tmp/wificonnectdev
+		touch /tmp/wificonnectdev	
+		queryWIFI4	
+	elif [ "_$1" = "_WIFI" ]; then
+		rm /tmp/wificonnectdev
+		touch /tmp/wificonnectdev	
+		queryWIFI1
+		queryWIFI2
+		queryWIFI3
+		queryWIFI4
+	elif [ "_$1" = "_WIFICOUNT" ]; then
+		rm /tmp/countwifidev
+		touch /tmp/countwifidev	
+		countWIFI
+		wc -l /tmp/countwifidev | sed 's/ .*$//g' >> /tmp/countwifidev
+	fi
+	
+	return
+fi
+
+rm /tmp/connectdev
+touch /tmp/connectdev
+
+LANIP=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select ipaddr from networkInterface where LogicalIfName = 'LAN1';"`
+LANMASK=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select subnetmask from networkInterface where LogicalIfName = 'LAN1';"`
+WLANEn_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wlanEnabled from wifiAP where wlanName = 'ap2';"`
+WLANEn_4=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wlanEnabled from wifiAP where wlanName = 'ap4';"`
+LAN_SUBNET_SEG_LAST=`ipcalc.sh $LANIP $LANMASK | grep IP | sed 's/^.*\.//g'`
+LAN_SUBNET_SEG=`ipcalc.sh $LANIP $LANMASK | grep IP | sed 's/^.*IP=//g' | sed "s/$LAN_SUBNET_SEG_LAST *$//g"`
+start=`ipcalc.sh $LANIP $LANMASK | grep NETWORK | sed 's/^.*\.//g'`
+end=`ipcalc.sh $LANIP $LANMASK | grep BROADCAST | sed 's/^.*\.//g'`
+
+# clear all arp entry
+arp -n -i br0 | while read line
+do
+	arpip=`echo $line | sed 's/^.*(//g' | sed 's/) .*$//g'`
+	arp -n -i br0 -d $arpip
+done 
+
+# clear all arp entry
+arp -n -i br1 | while read line
+do
+	arpip=`echo $line | sed 's/^.*(//g' | sed 's/) .*$//g'`
+	arp -n -i br1 -d $arpip
+done 
+
+# send arp to LAN subnet	
+for br0_pool in `seq $start 1 $end`
+do
+	if [ "1" = "$br0_pool" ]; then
+		echo "arping -I br0 -q -c 1 $LAN_SUBNET_SEG$br0_pool &" > /tmp/arpdevice.$$
+	else
+		echo "arping -I br0 -q -c 1 $LAN_SUBNET_SEG$br0_pool &" >> /tmp/arpdevice.$$
+	fi
+done
+
+if [ "$WLANEn_2" = "1" -o "$WLANEn_4" = "1" ];then
+	for br1_pool in `seq 100 1 200`
+	do
+		echo "arping -I br1 -q -c 1 192.168.254.$br1_pool &" >> /tmp/arpdevice.$$
+	done
+fi
+
+. /tmp/arpdevice.$$
+rm -f /tmp/arpdevice.$$
+
+# write arp table to /tmp/connectdev
+touch /tmp/connectdev
+
+# write list to connectdev
+arp -n -i br0 | grep ":" | while read line
+do
+	ip=`echo $line | sed 's/^.*(//g' | sed 's/) .*$//g'`
+	mac=`echo $line | sed 's/^.*at //g' | sed 's/ \[.*$//g'`
+	
+	# match wifi0
+	iwlist wlan0 peers | grep -v wlan0 | tr A-Y a-y | grep "$mac"
+	if [ $? == 0 ];then
+		from="WIFI1"
+	else
+		# for wifi AC
+		wlanconfig ath0 list station | tr A-Y a-y | grep "$mac"
+		if [ $? == 0 ];then
+			from="WIFI3"
+		else
+			from="LAN"
+		fi
+	fi
+	
+	dumpleases -f /var/lib/misc/udhcpd.leases | grep "$ip" | grep "$mac"
+	if [ $? == 0 ];then
+		ipstatus="DHCP"
+		devname=`dumpleases -f /var/lib/misc/udhcpd.leases | grep $ip | awk '{print "" $3}'`
+			
+		# for empty hostname
+		echo $devname | grep ":"
+		if [ $? == 0 ];then
+			devname="(null)"
+		else
+			# for empty hostname && expired
+			echo $devname | grep "expired"
+			if [ $? == 0 ];then
+				devname="(null)"
+			fi
+		fi
+	else
+		ipstatus="STATIC"
+		devname="(null)"
+	fi
+		
+	echo "$ip $mac $from $ipstatus $devname" >> /tmp/connectdev
+done 
+
+# catch wlan0 device without IP
+iwlist wlan0 peers | grep -v wlan0 | tr A-Y a-y | while read line
+do
+	# match wifi table
+	arp -n -i br0 | grep "$line"
+	if [ $? == 0 ];then
+		continue		
+	else
+		echo $line | grep wlan0
+		if [ $? == 0 ];then
+			continue		
+		fi
+	
+		ip="(null)"
+		mac=$line
+		from="WIFI1"
+		ipstatus="STATIC"
+		devname="(null)"
+	fi
+			
+	echo "$ip $mac $from $ipstatus $devname" >> /tmp/connectdev
+done
+
+# catch ath0 device without IP
+wlanconfig ath0 list station | grep ":" | tr A-Y a-y | awk '{print "" $1}' | while read line
+do
+	# match wifi table
+	arp -n -i br0 | grep "$line"
+	if [ $? == 0 ];then
+		continue		
+	else
+		ip="(null)"
+		mac=$line
+		from="WIFI3"
+		ipstatus="STATIC"
+		devname="(null)"
+	fi
+			
+	echo "$ip $mac $from $ipstatus $devname" >> /tmp/connectdev
+done
+
+
+if [ "$WLANEn_2" = "1" -o "$WLANEn_4" = "1" ];then
+	# write list to connectdev
+	arp -n -i br1 | grep ":" | while read line
+	do
+		ip=`echo $line | sed 's/^.*(//g' | sed 's/) .*$//g'`
+		mac=`echo $line | sed 's/^.*at //g' | sed 's/ \[.*$//g'`
+		
+		# match wifi0.0
+		iwlist wlan0.0 peers | grep -v wlan0 | tr A-Y a-y | grep "$mac"
+		if [ $? == 0 ];then
+			from="WIFI2"
+		else
+			# only wifi0.0 & ath1 bridge
+			from="WIFI4"
+		fi
+		
+		dumpleases -f /var/lib/misc/udhcpd_br1.leases | grep "$ip" | grep "$mac"
+		if [ $? == 0 ];then
+			ipstatus="DHCP"
+			devname=`dumpleases -f /var/lib/misc/udhcpd_br1.leases | grep $ip | awk '{print "" $3}'`
+				
+			# for empty hostname
+			echo $devname | grep ":"
+			if [ $? == 0 ];then
+				devname="(null)"
+			else
+				# for empty hostname && expired
+				echo $devname | grep "expired"
+				if [ $? == 0 ];then
+					devname="(null)"
+				fi
+			fi
+		else
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+			
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/connectdev
+	done 
+
+	# catch wlan0.0 device without IP
+	iwlist wlan0.0 peers | grep -v wlan0 | tr A-Y a-y | while read line
+	do
+		# match wifi table
+		arp -n -i br1 | grep "$line"
+		if [ $? == 0 ];then
+			continue		
+		else
+			echo $line | grep wlan0.0
+			if [ $? == 0 ];then
+				continue		
+			fi
+			
+			ip="(null)"
+			mac=$line
+			from="WIFI2"
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+				
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/connectdev
+	done
+
+	# catch ath1 device without IP
+	wlanconfig ath1 list station | grep ":" | tr A-Y a-y | awk '{print "" $1}' | while read line
+	do
+		# match wifi table
+		arp -n -i br1 | grep "$line"
+		if [ $? == 0 ];then
+			continue		
+		else
+			ip="(null)"
+			mac=$line
+			from="WIFI4"
+			ipstatus="STATIC"
+			devname="(null)"
+		fi
+				
+		echo "$ip $mac $from $ipstatus $devname" >> /tmp/connectdev
+	done
+fi

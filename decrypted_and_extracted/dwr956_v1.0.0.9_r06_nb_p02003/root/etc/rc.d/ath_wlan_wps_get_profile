@@ -1,0 +1,94 @@
+#!/bin/sh
+
+
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+ATH_IF=""
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+    
+    wps_ap_profile_file=/tmp/wsc_profile
+    wps_config_file=/tmp/WSC_${APNAME}.conf
+    rm -f ${wps_ap_profile_file}
+
+    HOSTAPD_VER=`/sbin/hostapd_ath -v 2>&1 | grep hostapd | cut -f2 -d' '`
+
+    if [ "${HOSTAPD_VER}" = "v0.5.9" ]; then
+      	 echo "CONFIGURED=\"EMPTY\""
+   	 echo "SSID=\"NONE\""
+      	 echo "BEACON=\"0\""
+      	 echo "AUTH=\"0\""
+         echo "ENCR=\"0\""
+         echo "PSK=\"0\""
+    else
+	 /sbin/hostapd_cli_ath -i ${APNAME} get_config >${wps_ap_profile_file}
+          
+	 WPS_STATE=$(grep "wps_state" ${wps_ap_profile_file} | cut -d "=" -f 2)	 
+	 if [ "${WPS_STATE}" = "not configured" ]; then
+      	     echo "CONFIGURED=\"EMPTY\""
+	 elif [ "${WPS_STATE}" = "configured" ]; then
+	     echo "CONFIGURED=\"1\""
+	 fi
+
+	 SSID=$(grep "ssid=" ${wps_ap_profile_file} | cut -d "=" -f 2 | sed -n "2p")
+	 if [ "${SSID}" != "" ]; then
+             echo "SSID=\"${SSID}\""
+	 fi
+	 
+	 KEY_MGMT=$(grep "key_mgmt" ${wps_ap_profile_file} | cut -d "=" -f 2)
+         if [ "${KEY_MGMT}" != "" ]; then
+	       WPA=$(grep "wpa=" ${wps_config_file} | cut -d "=" -f 2)
+	       if [ "${WPA}" = "1" ]; then
+	            echo "BEACON=\"1\""
+                    echo "AUTH=\"3\""
+       	       elif [ "${WPA}" = "2" ]; then
+		    echo "BEACON=\"2\""
+                    echo "AUTH=\"3\""
+ 	       elif [ "${WPA}" = "3" ]; then
+                    echo "BEACON=\"3\""
+                    echo "AUTH=\"3\""
+	       fi
+	fi
+
+        CYPHER=$(grep "rsn_pairwise_cipher" ${wps_ap_profile_file} | cut -d "=" -f 2)
+	if [ "${CYPHER}" = "" ]; then
+		CYPHER=$(grep "wpa_pairwise_cipher" ${wps_ap_profile_file} | cut -d "=" -f 2)
+	fi
+	if [ "${CYPHER}" != "" ]; then
+	    if [ ${CYPHER} = "TKIP" ]; then
+                echo "ENCR=\"2\""
+	    elif [ ${CYPHER} = "CCMP" ]; then
+                echo "ENCR=\"3\""
+	    elif [ ${CYPHER} = "CCMP TKIP" -o ${CYPHER} = "TKIP CCMP" ]; then
+                echo "ENCR=\"4\""
+	    fi
+	fi
+
+	PSK=$(grep "passphrase" ${wps_ap_profile_file} | cut -d "=" -f 2)
+	if [ "${PSK}" != "" ]; then
+      	    echo "PSK=\"${PSK}\""
+	fi
+    fi
+fi

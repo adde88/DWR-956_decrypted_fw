@@ -1,0 +1,17 @@
+Package: radvd
+Version: 1.8.3-1
+Depends: kmod-ipv6
+Provides: 
+Source: package/feeds/open_applications/radvd
+Section: ipv6
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 30715
+Description:  radvd is the router advertisement daemon for IPv6. It listens to router
+ solicitations and sends router advertisements as described in "Neighbor
+ Discovery for IP Version 6 (IPv6)" (RFC 4861).  With these advertisements hosts
+ can automatically configure their addresses and some other parameters. They also
+ can choose a default router based on these advertisements.

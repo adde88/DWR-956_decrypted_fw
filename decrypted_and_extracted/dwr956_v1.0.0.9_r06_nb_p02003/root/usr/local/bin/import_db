@@ -1,0 +1,48 @@
+#!/usr/local/bin/lua
+-- TODO:1. new function to import single table
+--	2. add merge table function
+--	3. add more error handler
+--	4. add checksum error check
+
+require "jnrplualib/db_lib"
+require "jnrplualib/config_lib"
+require "jnrplualib/config_merge"
+require "jnrplualib/util_lib"
+
+local status = ""
+local upFwFlag = "false"
+
+
+-- step 0: determine firmware version (upgrade FW Flag)
+upFwFlag = config.verifyVer(arg[2], arg[3])
+print("Firmware Upgrade: " .. upFwFlag)
+
+if upFwFlag == "true" then
+
+-- firmware upgrade : true
+-- step 1: merge new default and current configuration
+	config.Merge(arg[1], arg[2], arg[3], arg[4])
+
+end
+
+-- step 2: import new ascii file
+status = configLib.importDB(arg[1], arg[2])
+
+-- step 3: Dirtect access DB data with sql query
+-- if upFwFlag == "true" and status =="OK" then
+--     configLib.directDBAccess(arg[1], arg[2], arg[3])
+-- end
+
+if status == "ERROR" then
+	print("Import DB : failed and reset to default")
+	--os.execute("rm -f /sysconfig/jnr-cfg.ascii")
+	--os.execute("cp -f /usr/local/etc/jnr-cfg.ascii.default /sysconfig/jnr-cfg.ascii")
+	--os.execute("reboot")
+	os.execute("factory_reset.sh")
+elseif status == "SQL_ERROR" then
+	print("Import DB : SQL ERROR")
+else
+	print(status)
+	print("Import DB : DONE")
+end
+os.exit()

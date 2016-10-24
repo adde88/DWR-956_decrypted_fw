@@ -1,0 +1,3 @@
+/ramdisk_copy/etc/iproute2/rt_tables
+/usr/sbin/ip
+/lib/upgrade/keep.d/ip

@@ -1,0 +1,151 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+ATH_IF=""
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    WIFIDEV=`ifconfig | grep wifi1 `
+    if [ "${WIFIDEV}" = "" ]; then
+        RADIONAME=wifi0
+    else
+        eval RADIONAME=wifi${1}
+    fi
+    find_ath_if_from_index $1    
+    #eval APNAME=ath0
+    eval APNAME=ath${ATH_IF}
+    
+    radio_dyn_file=/tmp/radio_dyn_info
+    rm -f ${radio_dyn_file}
+    
+    ifconfig ${RADIONAME} >> ${radio_dyn_file}
+    iwconfig ${APNAME} >> ${radio_dyn_file}
+    iwlist ${APNAME} channel >> ${radio_dyn_file}
+    iwpriv ${APNAME} get_chwidth >> ${radio_dyn_file}
+    iwpriv ${APNAME} get_shortgi >> ${radio_dyn_file}
+        
+    ap_freq_file=/tmp/ath_freq_data
+    G_FREQ=$(grep "2.412" $ap_freq_file)
+    A_FREQ=$(grep "5.18" $ap_freq_file)
+
+    UP_STATUS=$(grep "UP" ${radio_dyn_file})
+    if [ "${UP_STATUS}" = "" ]; then
+        status=0
+    else
+        status=1
+    fi
+        
+    freq=$(grep "Frequency" ${radio_dyn_file} | cut -d ":" -f 3 | cut -d " " -f 1)
+    BW=$(grep "get_chwidth" ${radio_dyn_file} | cut -d ":" -f 2 | cut -d " " -f 1)
+    GI=$(grep "get_shortgi" ${radio_dyn_file} | cut -d ":" -f 2 | cut -d " " -f 1)
+   
+    #echo "freq: $freq" 
+    #echo "A_FREQ: $A_FREQ"
+ 
+	  if [ "$A_FREQ" = "" ]; then
+    if [ "$freq" = "2.412" ]; then
+        channel="1"
+    elif [ "$freq" = "2.417" ]; then 
+        channel="2"
+    elif [ "$freq" = "2.422" ]; then  
+        channel="3"
+    elif [ "$freq" = "2.427" ]; then  
+       channel="4"
+    elif [ "$freq" = "2.432" ]; then 
+       channel="5"
+    elif [ "$freq" = "2.437" ]; then 
+       channel="6"
+    elif [ "$freq" = "2.442" ]; then
+       channel="7"
+    elif [ "$freq" = "2.447" ]; then 
+       channel="8"
+    elif [ "$freq" = "2.452" ]; then  
+       channel="9"
+    elif [ "$freq" = "2.457" ]; then 
+       channel="10"
+    elif [ "$freq" = "2.462" ]; then
+       channel="11"
+    elif [ "$freq" = "2.467" ]; then  
+       channel="12"
+    elif [ "$freq" = "2.472" ]; then
+       channel="13"
+    fi
+    else
+      if [ "$freq" = "5.18" ]; then
+        channel="36"
+      elif [ "$freq" = "5.2" ]; then 
+        channel="40"
+      elif [ "$freq" = "5.22" ]; then 
+        channel="44"
+      elif [ "$freq" = "5.24" ]; then 
+        channel="48"
+      elif [ "$freq" = "5.26" ]; then 
+        channel="52"
+      elif [ "$freq" = "5.28" ]; then 
+        channel="56"
+      elif [ "$freq" = "5.3" ]; then 
+        channel="60"
+      elif [ "$freq" = "5.32" ]; then 
+        channel="64"
+      elif [ "$freq" = "5.5" ]; then 
+        channel="100"
+      elif [ "$freq" = "5.52" ]; then 
+        channel="104"
+      elif [ "$freq" = "5.54" ]; then 
+        channel="108"
+      elif [ "$freq" = "5.56" ]; then 
+        channel="112"
+      elif [ "$freq" = "5.58" ]; then 
+        channel="116"
+      elif [ "$freq" = "5.6" ]; then 
+        channel="120"
+      elif [ "$freq" = "5.62" ]; then 
+        channel="124"
+      elif [ "$freq" = "5.64" ]; then 
+        channel="128"
+      elif [ "$freq" = "5.66" ]; then 
+        channel="132"
+      elif [ "$freq" = "5.68" ]; then 
+        channel="136"
+      elif [ "$freq" = "5.7" ]; then 
+        channel="140"
+      elif [ "$freq" = "5.72" ]; then 
+        channel="144"
+      elif [ "$freq" = "5.745" ]; then 
+        channel="149"
+      elif [ "$freq" = "5.765" ]; then 
+        channel="153"
+      elif [ "$freq" = "5.785" ]; then 
+        channel="157"
+      elif [ "$freq" = "5.805" ]; then 
+        channel="161"
+      elif [ "$freq" = "5.825" ]; then 
+        channel="165"
+      fi
+    fi
+    echo "status=\"$status\""
+    echo "channelsInUse=\"\""
+    echo "channel=\"$channel\""
+    echo "chanWidth=\"$BW\""
+    echo "guardIntvl=\"$GI\""
+    echo "MCS=\"\""
+fi

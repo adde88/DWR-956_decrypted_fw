@@ -1,0 +1,13 @@
+Package: hostapd_08x
+Version: 78debc7-1
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/hostapd_08x
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 199798
+Description:  IEEE 802.11 AP, IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator

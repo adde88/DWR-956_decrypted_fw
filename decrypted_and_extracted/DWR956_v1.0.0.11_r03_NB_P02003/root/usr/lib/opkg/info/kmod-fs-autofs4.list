@@ -1,0 +1,2 @@
+/lib/modules/2.6.32.42/autofs4.ko
+/etc/modules.d/30-fs-autofs4

@@ -1,0 +1,15 @@
+#! /bin/sh
+
+if [ "$1" = "usb0" ] ; then 
+	route del default
+fi
+
+# clear ifconfig
+ifconfig $1 0.0.0.0
+ifconfig $1 down
+
+adv_route stop $1
+
+rm /tmp/dhcpc_$1.result
+
+adv_dns $1

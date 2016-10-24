@@ -1,0 +1,13 @@
+Package: tinytcl
+Version: 680-1
+Depends: 
+Provides: 
+Source: package/feeds/open_applications/tinytcl
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 56013
+Description:  Rommable, minimal Tcl for embedded applications

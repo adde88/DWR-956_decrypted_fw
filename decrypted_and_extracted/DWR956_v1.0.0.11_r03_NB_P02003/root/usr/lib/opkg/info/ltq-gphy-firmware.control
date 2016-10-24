@@ -1,0 +1,13 @@
+Package: ltq-gphy-firmware
+Version: 1.4-1
+Depends: 
+Provides: 
+Source: package/feeds/ltq_gphy_firmware/ltq-gphy-firmware
+Section: firmware
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: Lantiq Deutschland GmbH
+Architecture: ltqcpe
+Installed-Size: 545
+Description:  Lantiq GPHY Firmware

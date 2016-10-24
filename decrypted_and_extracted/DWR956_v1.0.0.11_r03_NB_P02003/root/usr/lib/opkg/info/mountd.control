@@ -1,0 +1,13 @@
+Package: mountd
+Version: 0.1-2.1
+Depends: uci, kmod-fs-autofs4
+Provides: 
+Source: package/feeds/open_applications/mountd
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 12804
+Description:  openwrt automount daemon

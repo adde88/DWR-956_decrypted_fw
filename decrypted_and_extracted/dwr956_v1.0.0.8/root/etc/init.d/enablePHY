@@ -1,0 +1,11 @@
+#!/bin/sh /etc/rc.common
+
+START=61
+
+start() {
+	echo "enable PHY..."
+	switch_utility PortLinkCfgSet 0 0 0 0 10 1 0 3 0 0
+	switch_utility PortLinkCfgSet 1 0 0 0 10 1 0 0 0 0
+	switch_utility PortLinkCfgSet 2 0 0 0 10 1 0 0 0 0
+	switch_utility PortLinkCfgSet 4 0 0 0 10 1 0 0 0 0
+}

@@ -1,0 +1,14 @@
+Package: sysstat
+Version: 9.0.6-1
+Depends: 
+Provides: 
+Source: package/feeds/open_debug_tools/sysstat
+Section: utils
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 24730
+Description:  The sysstat utilities are a collection of performance monitoring tools for
+ Linux. These include sar, sadf, mpstat, iostat, pidstat and sa tools.

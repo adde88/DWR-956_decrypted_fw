@@ -1,0 +1,13 @@
+Package: kmod-nfnetlink
+Version: 2.6.32.42-1
+Depends: kernel (=2.6.32.42-1-unknown), kmod-ipt-core
+Provides: 
+Source: package/kernel
+Section: kernel
+Status: unknown hold not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 2770
+Description:  Kernel modules support for a netlink-based userspace interface

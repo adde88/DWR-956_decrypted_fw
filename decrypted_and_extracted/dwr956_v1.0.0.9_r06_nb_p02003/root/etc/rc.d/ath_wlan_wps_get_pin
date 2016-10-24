@@ -1,0 +1,50 @@
+#!/bin/sh
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+if [ ! "$CONFIGLOADED" ]; then
+	if [ -r /etc/rc.d/config.sh ]; then
+		. /etc/rc.d/config.sh 2>/dev/null
+		CONFIGLOADED="1"
+	fi
+fi
+
+ATH_IF=""
+
+find_ath_if_from_index() {
+   eval CPEID='$'wlmn_${1}'_cpeId'
+   ath_dev=`/usr/sbin/status_oper GET "ATH_MAP" "$CPEID"`
+   ATH_IF=${ath_dev:3}
+   #echo "ATH_IF $ATH_IF "
+}
+
+
+if [ "$CONFIG_FEATURE_IFX_WIRELESS" = "1" ]; then
+    find_ath_if_from_index $1
+    eval APNAME=ath${ATH_IF}
+    eval pcpeId='$'wlmn_${1}_cpeId
+    eval APPIN='$'wlwps${pcpeId}_${1}_apPIN
+    
+    wps_ap_pin_file=/tmp/wps_ap_pin_file
+    wps_default_pin_file=/tmp/WSC_${APNAME}.conf
+
+    HOSTAPD_VER=`/sbin/hostapd_ath -v 2>&1 | grep hostapd | cut -f2 -d' '`
+    if [ -f ${wps_ap_pin_file} ];  then
+   	PIN=$(grep "PIN" ${wps_ap_pin_file} | cut -d "=" -f 2)
+   	echo "PIN=\"$PIN\""
+    elif [ -f ${wps_default_pin_file} ]; then
+	if [ "${HOSTAPD_VER}" = "v0.5.9" ]; then
+    	    PIN=$(grep "wps_default_pin" ${wps_default_pin_file} | cut -d "=" -f 2)
+	else
+	    PIN=$(grep "ap_pin" ${wps_default_pin_file} | cut -d "=" -f 2)
+	fi
+   	echo "PIN=\"$PIN\""
+    else
+    	echo "PIN=\"$APPIN\""
+    fi
+fi

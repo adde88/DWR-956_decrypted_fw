@@ -1,0 +1,27 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org
+#START=63
+
+if [ ! "$ENVLOADED" ]; then
+	if [ -r /etc/rc.conf ]; then
+		 . /etc/rc.conf 2> /dev/null
+		ENVLOADED="1"
+	fi
+fi
+
+DWATCH="/usr/sbin/dwatch"
+DWATCHCTL="/usr/sbin/dwatchctl"
+
+start() {
+	/usr/sbin/dwatch
+}
+
+stop() {
+	killall dwatch
+}
+
+restart() {
+        stop
+		sleep 3
+        start
+}

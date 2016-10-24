@@ -1,0 +1,89 @@
+#! /bin/sh
+
+LOCK_FILE=/tmp/rcdialup_lock_$1
+if [ -e $LOCK_FILE ]; then
+    echo "dialup is running!"
+	return
+else
+	echo "1" > $LOCK_FILE
+fi
+
+NATENABLE=`sqlite+ /tmp/system.db "select Enable from FirewallNatConfig;"`
+
+# LTE iface up
+ifconfig $1 up
+
+sleep 1
+echo "dialup timeout!"
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo "start udhcpc to get $1 inet address"
+UDHCPC_USB_PIDFILE="/tmp/udhcpc_$1.pid"
+lastpid=`cat ${UDHCPC_USB_PIDFILE}`
+rm -f /tmp/dhcpc_$1.result
+if [ ! "_$lastpid" = "_" ]; then
+	kill -9 ${lastpid}
+fi
+
+# check bridge mode for usb0
+if [ "$1" = "usb0" ] ; then 
+	if [ "$NATENABLE" = "5" ]; then #bridge mode
+		brctl addif br0 usb0
+	
+		# disable PHY first
+		/etc/init.d/disablePHY start
+		
+		sleep 3
+		
+		# enable PHY last
+		/etc/init.d/enablePHY start
+		
+        rm -f $LOCK_FILE
+		return 0
+	fi
+fi
+	
+udhcpc -i $1 -p ${UDHCPC_USB_PIDFILE} -s udhcpc_$1.script -S &
+sleep 3
+echo "udhcpc finished!!"
+
+USB_ADDR=`grep 'ip ' /tmp/dhcpc_$1.result |sed '1s/ip //'`
+echo "load the $1 address : $USB_ADDR"
+
+if [ "_$USB_ADDR" = "_" ]
+then 
+	echo "$1 not ready,try again 3s later.... "
+	sleep 3
+fi
+
+USB_ADDR=`grep 'ip ' /tmp/dhcpc_$1.result |sed '1s/ip //'`
+if [ "_$USB_ADDR" = "_" ]
+then 
+	echo "$1 not ready,try again 6s later.... "
+	sleep 6
+fi
+
+USB_ADDR=`grep 'ip ' /tmp/dhcpc_$1.result |sed '1s/ip //'`
+if [ "_$USB_ADDR" = "_" ]
+then 
+	echo "$1 not ready,try again 9s later.... "
+	sleep 9
+fi
+
+USB_ADDR=`grep 'ip ' /tmp/dhcpc_$1.result |sed '1s/ip //'`
+if [ "_$USB_ADDR" = "_" ]
+then 
+	echo "$1 cannot get ip address, check modem board or MAC!!!!!!!!!!"
+fi
+
+if [ "_$USB_ADDR" != "_" ]
+then
+    #howard add vpn-mgr
+    #killall vpn-mgr
+    #vpn-mgr &
+    #howard add vpn-mgr end
+    #adv_route start $1
+
+    # if wan is ready, then start WAN's IPv6 function.
+    /usr/local/bin/ipv6_wan.sh
+fi
+rm -f $LOCK_FILE

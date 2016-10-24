@@ -1,0 +1,13 @@
+Package: arptables
+Version: 0.0.3-3-1
+Depends: kmod-arptables
+Provides: 
+Source: package/arptables
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 20724
+Description:  ARP firewalling software

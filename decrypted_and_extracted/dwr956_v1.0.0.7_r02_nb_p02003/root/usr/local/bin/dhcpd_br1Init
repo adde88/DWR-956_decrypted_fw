@@ -1,0 +1,55 @@
+#!/bin/sh
+
+WLANEn_2=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wlanEnabled from wifiAP where wlanName = 'ap2';"`
+WLANEn_4=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select wlanEnabled from wifiAP where wlanName = 'ap4';"`
+
+if [ -e /tmp/udhcpd_br1.pid ];then
+	if [ "_$1" = "_stop" ];then	
+		if [ "$WLANEn_2" = "0" -a "$WLANEn_4" = "0" ];then
+			kill `cat /tmp/udhcpd_br1.pid`
+			
+			# remove leases file for br1
+			rm -f /var/lib/misc/udhcpd_br1.leases
+		fi
+	fi
+	return
+else
+	if [ "_$1" = "_stop" ];then	
+		return
+	fi
+fi
+	
+NATENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from FirewallNatConfig;"`
+ENABLE=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select Enable from DhcpServerBasic where Id = '1';"`
+if [ "$ENABLE" = "1" -a "$NATENABLE" = "1" ]; then
+
+	iptables -D DEFAULT_POLICY -i br1 -j ACCEPT
+
+	brctl delif br0 wlan0.0
+	brctl delif br0 ath1
+
+	brctl addbr br1
+	brctl addif br1 wlan0.0
+	brctl addif br1 ath1
+
+	ifconfig br1 192.168.254.1 netmask 255.255.255.0 hw ether 00:19:CB:00:00:11 up
+	iptables -A DEFAULT_POLICY -i br1 -j ACCEPT
+
+	LEASE_TIME=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select LeaseTime from DhcpServerBasic where Id = '1';"`
+	DOMAIN=`sqlite3 -cmd ".timeout 1000" /tmp/system.db "select domain from system;"`
+	
+	echo "start 192.168.254.100" > /tmp/udhcpd_br1.conf
+	echo "end 192.168.254.200" >> /tmp/udhcpd_br1.conf
+	echo "interface br1" >> /tmp/udhcpd_br1.conf
+	echo "max_leases 101" >> /etc/udhcpd.conf
+	echo "option router 192.168.254.1" >> /tmp/udhcpd_br1.conf
+	echo "option dns 192.168.254.1" >> /tmp/udhcpd_br1.conf
+	echo "option subnet 255.255.255.0" >> /tmp/udhcpd_br1.conf
+	echo "option domain $DOMAIN" >> /tmp/udhcpd_br1.conf
+	echo "option lease $LEASE_TIME" >> /tmp/udhcpd_br1.conf
+	echo "pidfile /tmp/udhcpd_br1.pid" >> /tmp/udhcpd_br1.conf
+	echo "lease_file /var/lib/misc/udhcpd_br1.leases" >> /tmp/udhcpd_br1.conf
+	
+	udhcpd -S /tmp/udhcpd_br1.conf &
+fi
+

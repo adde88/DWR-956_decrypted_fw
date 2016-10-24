@@ -1,0 +1,20 @@
+PROFILES:2
+0, 1
+0, 2
+==========0, 1
+45 (IPv4AddressAlloc), 1, 0
+29 (AuthenticationPreference), 1, 0
+28 (Password), 0,
+27 (Username), 0,
+20 (APNName), 11, telenor.mbb
+17 (PDPType), 1, 0
+16 (ProfileName), 8, profile1
+==========0, 2
+45 (IPv4AddressAlloc), 1, 0
+29 (AuthenticationPreference), 1, 0
+28 (Password), 0,
+27 (Username), 0,
+20 (APNName), 0, 
+17 (PDPType), 1, 0
+16 (ProfileName), 8, profile2
+

@@ -1,0 +1,84 @@
+#!/bin/sh /etc/rc.common
+
+START=60
+STOP=60
+
+# switch antenna
+sw_ant(){
+        echo "#! /bin/sh" > /mnt/data/ant_sw_int
+        echo "echo 0 > /mnt/data/ant_status" >> /mnt/data/ant_sw_int
+        echo "echo 0 > /sys/devices/virtual/leds/ANT_SW/brightness" >> /mnt/data/ant_sw_int
+        echo "echo 0 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness" >> /mnt/data/ant_sw_int
+        echo "echo 0 > /proc/ant_sw/ant_sw_state" >> /mnt/data/ant_sw_int
+        echo "sync" >> /mnt/data/ant_sw_int
+        chmod +x /mnt/data/ant_sw_int
+
+        echo "#! /bin/sh" > /mnt/data/ant_sw_ext
+        echo "echo 255 > /mnt/data/ant_status" >> /mnt/data/ant_sw_ext
+        echo "echo 255 > /sys/devices/virtual/leds/ANT_SW/brightness" >> /mnt/data/ant_sw_ext
+        echo "echo 255 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness" >> /mnt/data/ant_sw_ext
+        echo "echo 1 > /proc/ant_sw/ant_sw_state" >> /mnt/data/ant_sw_ext
+        echo "sync" >> /mnt/data/ant_sw_ext
+        chmod +x /mnt/data/ant_sw_ext
+
+        ant_status=255
+        [ -e /mnt/data/ant_status ] && ant_status=`cat /mnt/data/ant_status` || echo 255 > /mnt/data/ant_status
+        if [ $ant_status = 0 ];then
+                echo 0 > /sys/devices/virtual/leds/ANT_SW/brightness
+                echo 0 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness
+                echo 0 > /proc/ant_sw/ant_sw_state
+        else
+                echo 255 > /sys/devices/virtual/leds/ANT_SW/brightness
+                echo 255 > /sys/devices/virtual/leds/LTE_ANT_IND/brightness
+                echo 1 > /proc/ant_sw/ant_sw_state
+        fi
+}
+
+
+start() {
+#	echo "Switch Antenna..." 
+#	sw_ant
+
+	echo "WAN init with lte_daemon..."
+	
+	ppacmd addwan -i usb0
+	
+	if [ ! -e /mnt/data/lte_connection_settings ];then
+		if [ ! -e /mnt/data/lte_connection_settings_backup ];then
+			echo "lte_connection_settings & lte_connection_settings_backup are gone, back up from /usr/local/etc/lte_connection_settings "
+			cp -f /usr/local/etc/lte_connection_settings /mnt/data/lte_connection_settings
+		else	
+			echo "lte_connection_settings is gone, back up from /mnt/data/lte_connection_settings_backup "
+			cp -f /mnt/data/lte_connection_settings_backup /mnt/data/lte_connection_settings
+		fi
+		sleep 1
+	fi
+
+	#echo 1 > /sys/devices/virtual/leds/LTE_RST/brightness
+	#while [ -e "/dev/qcqmi0" ]; do
+	#  sleep 1
+	#done
+	#sleep 1
+	#echo 0 > /sys/devices/virtual/leds/LTE_RST/brightness
+
+	/etc/init.d/lte_daemon.sh start 
+	
+	#/etc/rc.d/S93lte_daemon.sh boot
+	#sleep 5
+	#/etc/rc.d/S94mal-sysmgr.sh start
+	#lte_set -q 0 -c
+	#sleep 5
+}
+
+stop() {
+	echo "WAN stop with lte_daemon..."
+	
+	/etc/init.d/lte_daemon.sh stop 
+	echo 1 > /sys/devices/virtual/leds/LTE_RST/brightness
+	Retry=0
+	while [ -e "/dev/qcqmi0" ]; do
+		sleep 2
+		Retry=$(( $Retry + 1 ))
+		echo "retry: $Retry"
+	done
+}

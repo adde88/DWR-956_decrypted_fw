@@ -1,0 +1,13 @@
+Package: ndisc6
+Version: 1.0.1-1
+Depends: libpthread, librt
+Provides: 
+Source: package/feeds/packages/ipv6/ndisc
+Section: ipv6
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 5232
+Description:  An ICMPv6 neighbour discovery tools

@@ -1,0 +1,13 @@
+Package: wide-dhcpv6
+Version: 20080615-1
+Depends: ifx-IFXAPIs
+Provides: 
+Source: package/feeds/open_applications/wide-dhcpv6
+Section: net
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ltqcpe
+Installed-Size: 126934
+Description:  DHCPv6 Client and Server
