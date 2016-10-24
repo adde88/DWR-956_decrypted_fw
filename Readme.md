@@ -1,6 +1,6 @@
-# DWR-956 decrypted firmwares.
+# D-link DWR-956 Firmware
 
-Decrypted and extracted firmwares for D-link DWR-956. 4G/LTE WiFi Router (2.4Ghz + 5Ghz)
+This repository contains both the encrypted, decrypted and the extracted content of all firmware versions for D-link DWR-956. 4G/LTE WiFi Router (2.4Ghz + 5Ghz)
 
 
 Folder structure:
